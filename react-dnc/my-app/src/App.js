@@ -3,8 +3,6 @@ import './App.css';
 import Header from './header.js';
 import { Layout } from 'antd';
 import Content from './content.js';
-import { BrowserRouter as Router, Route, Link} from "react-router-dom";
-import AppLog from './GitLogin';
 
 const { header, footer, content } = Layout;
 class App extends Component{
@@ -12,8 +10,8 @@ class App extends Component{
     return(
       <div>
           <Layout>
-          <AppLog />
             <header><Header /></header>
+            <a herf='https://github.com/login/oauth/authorize?client_id=31ec50555fca84725afa'>github</a>
             <content><Content /></content>
             <footer>Footer</footer>
           </Layout>

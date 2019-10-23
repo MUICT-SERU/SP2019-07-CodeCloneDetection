@@ -8,6 +8,7 @@
     "bootstrap": "^4.3.1",
     "core-js": "^3.1.4",
     "customize-cra": "^0.4.1",
+    "express": "^4.17.1",
     "flow-bin": "^0.102.0",
     "gitstar-components": "^1.0.5",
     "react": "^16.8.6",

@@ -26,6 +26,7 @@ app.get('/oauth/redirect', (req, res) => {
     // Once we get the response, extract the access token from
     // the response body
     const accessToken = response.data.access_token
+    //const username = response.data.username
     // redirect the user to the welcome page, along with the access token
     res.redirect(`/welcome.html?access_token=${accessToken}`)
   })
@@ -33,7 +34,7 @@ app.get('/oauth/redirect', (req, res) => {
 
 app.use(express.static(__dirname + '/frontend'))
 
-//localhost 3001
-app.listen(8080,() => {
-  console.log("system listen to port 3001..");
+//localhost 8001
+app.listen(8001,() => {
+  console.log("system listen to port 8001..");
 })

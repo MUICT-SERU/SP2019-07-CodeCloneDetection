@@ -26,7 +26,7 @@ class Content extends Component {
            Submit
          </Button>
        </Form.Item>
-     </Form>
+       </Form>
     );
 }
 }
