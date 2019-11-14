@@ -1,6 +1,14 @@
 <html lang="en">
 
 <head>
+	<style>
+	a {
+	font-size: 50;
+	padding-top: 50px;
+	padding-left: 50px:
+}
+	</style>
+
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -8,9 +16,13 @@
 </head>
 
 <body>
- Repositories
+
+<a> Repositories</a>
+
+ <br>
 </body>
 <script>
+
 	// We can get the token from the "access_token" query
 	// param, available in the browsers "location" global
 	const query = window.location.search.substring(1)
@@ -32,8 +44,11 @@
 			console.log(res);
 			var i = 0;
 			for(i = 0 ; i < res.length ; i++){
-				const repos = document.createTextNode(`   repo ${res[i].clone_url}`)
+				linebreak = document.createElement("br");
+				const repos = document.createTextNode(`   repo ${res[i].name} ${res[i].clone_url}`)
+				document.body.appendChild(linebreak)
 				document.body.appendChild(repos)
+
 			}
 
 		})
