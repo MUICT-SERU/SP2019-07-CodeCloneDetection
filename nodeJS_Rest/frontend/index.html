@@ -5,6 +5,12 @@
   font-size: 100;
   padding-left: 43%;
 }
+
+  p {
+  font-size: 45;
+  padding-left: 40%;
+  padding-bottom: 15%;
+}
   </style>
   <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -15,16 +21,34 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-md navbar-light bg-light">
+      <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link">
+                  <img src="/images/logo.png" alt="Merry's logo" style="width:70px;height:70px;">
+                </a>
+            </li>
+          </ul>
+        </div>
  <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
    <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <a class="nav-link" href="https://github.com/login/oauth/authorize?client_id=31ec50555fca84725afa&redirect_uri=http://localhost:8001/oauth/redirect">Login with github</a>
+                <a class="nav-link" href="https://github.com/login/oauth/authorize?client_id=31ec50555fca84725afa&redirect_uri=http://localhost:8001/oauth/redirect">Login with GitHub</a>
             </li>
           </ul>
     </div>
 </nav>
 <br>
     <b>Merry </b>
+    <p>Code Clone Detection</p>
+
+    <form  align="center" action="http://localhost:8001/urlcloning" method="post">
+      <div class="form-group"  align="center">
+        <input type="url" class="form-control form-control-lg" name="GitHubURL" placeholder="Input GitHub URL" style="width:60%">
+      </div>
+     <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
 </body>
 
 </html>

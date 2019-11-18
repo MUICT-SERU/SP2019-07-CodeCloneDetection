@@ -1,7 +1,8 @@
 const express = require('express')
-
 // Import the axios library, to make HTTP requests
 const axios = require('axios')
+
+// const exec = require('child_process')
 
 const app = express()
 
@@ -33,6 +34,21 @@ app.get('/oauth/redirect', (req, res) => {
 })
 
 app.use(express.static(__dirname + '/frontend'))
+
+// app.use(bodyParser.urlencoded({ extended: true }));
+
+// app.post('/urlcloning',(req,res) => {
+//   console.log(`${req.body.GitHubURL}`);
+//   exec('git clone '+`${req.body.GitHubURL}`+' ./test',(error, stdout, stderr) => {
+//     if (error) {
+//     console.error(`exec error: ${error}`);
+//     return;
+//   }
+//   console.log(`stdout: ${stdout}`);
+//   console.error(`stderr: ${stderr}`);
+//   res.send(alert(`stderr: ${stderr}`));
+//   })
+// })
 
 //localhost 8001
 app.listen(8001,() => {

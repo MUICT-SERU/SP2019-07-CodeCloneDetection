@@ -5,19 +5,55 @@
 	a {
 	font-size: 50;
 	padding-top: 50px;
-	padding-left: 50px:
+	padding-left: 25px;
 }
+/* .table{
+		height:200%;
+		width:200%;
+		padding:0;
+		margin:0;
+} */
 	</style>
 
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 	<title>Hello</title>
 </head>
 
 <body>
+	<nav class="navbar navbar-expand-md navbar-light bg-light">
+		<div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
+			<ul class="navbar-nav mr-auto">
+					<li class="nav-item active">
+							<a class="nav-link">
+								<img src="/images/logo.png" alt="Merry's logo" style="width:70px;height:70px;">
+							</a>
+					</li>
+				</ul>
+			</div>
+<div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+ <ul class="navbar-nav ml-auto" id="menu">
+					<li class="nav-item">
+							<b class="nav-link" href="" id="logout-button">Logout</b>
+					</li>
+				</ul>
+	</div>
+</nav>
 
 <a> Repositories</a>
+
+<table id="showRepos" class="table table-bordered" style="width:98%" align="center">
+	<thead>
+<tr>
+	<th>No.</th>
+	<th>Repository's Name</th>
+	<th>Clone URL</th>
+	<th>Action</th>
+</tr>
+</thead>
+</table>
 
  <br>
 </body>
@@ -41,15 +77,39 @@
 			// Write "Welcome <user name>" to the documents body
 			// const nameNode = document.createTextNode(`Welcome, ${res.name}`)
 			// document.body.appendChild(nameNode)
-			console.log(res);
-			var i = 0;
-			for(i = 0 ; i < res.length ; i++){
-				linebreak = document.createElement("br");
-				const repos = document.createTextNode(`   repo ${res[i].name} ${res[i].clone_url}`)
-				document.body.appendChild(linebreak)
-				document.body.appendChild(repos)
+			const tbl = document.getElementById('showRepos')
+			const tblBody = document.createElement('tbody')
+			var i = 0, j=0;
+			for(i=0; i<res.length; i++){
+				const tr = document.createElement('tr');
+			for(j = 0 ; j < 4 ; j++){
+
+
+				const count = document.createTextNode(i+1)
+				const reposName = document.createTextNode( `${res[i].name}`)
+				const reposCloneURL = document.createTextNode(`${res[i].clone_url}`)
+
+				const ActionButton = document.createElement('button')
+				ActionButton.innerHTML = "Click to Analyze"
+
+			  const td = document.createElement('td');
+				if(j==0){
+					td.appendChild(count)
+				}else if(j==1){
+					td.appendChild(reposName)
+				}else if(j==2){
+				td.appendChild(reposCloneURL)
+			}
+			else if(j==3){
+				td.appendChild(ActionButton).className="btn btn-success"
+			}
+
+			tr.appendChild(td);
 
 			}
+				tblBody.appendChild(tr);
+			}
+				tbl.appendChild(tblBody);
 
 		})
 
