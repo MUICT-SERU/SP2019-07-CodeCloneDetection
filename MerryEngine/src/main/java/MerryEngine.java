@@ -14,7 +14,6 @@ public class MerryEngine {
         List<Method> methodList = new ArrayList<Method>();
         System.out.println("Java files : "+fileList.size());
         for (String f : fileList) {
-//            System.out.println(s);
 //            File file = new File(s);
 //            BufferedReader br = new BufferedReader(new FileReader(file));
 //            String st;
