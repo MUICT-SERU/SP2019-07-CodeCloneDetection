@@ -70,7 +70,7 @@ public class JavaMethodParser {
             }
             Method m = null;
             try {
-                m = new Method(start,end,path,fileName,n.toString(ppc),n.getName().asString());
+                m = new Method(start,end,path,fileName,n.toString(ppc),n.getName().asString(),n.getTypeAsString());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -95,7 +95,7 @@ public class JavaMethodParser {
             }
             Method m = null;
             try {
-                m = new Method(start,end,path,fileName,c.toString(ppc),c.getName().asString());
+                m = new Method(start,end,path,fileName,c.toString(ppc),c.getName().asString(),"Constructor");
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -23,7 +23,7 @@ public class Method {
     private String returnType;
 
 
-    public Method(int start, int end, String path,String fileName, String code, String name) throws Exception {
+    public Method(int start, int end, String path,String fileName, String code, String name,String type) throws Exception {
         this.startLine = start;
         this.endLine = end;
         this.filePath = path;
@@ -31,35 +31,29 @@ public class Method {
         this.sourceCode = code;
         this.methodName = name;
         this.lineOfCode = end - start;
+        this.returnType = type;
         gatherMetrics();
     }
 
     private void gatherMetrics() throws Exception {
         this.sourceCodeTokens = (new JavaTokenizer(this.sourceCode).tokenize());
-        Set<Token> tokenSet = new HashSet<Token>();
-        Set<Token> identifierSet = new HashSet<Token>();
-        Set<Token> operatorSet = new HashSet<>();
+        Set<String> tokenSet = new HashSet<>();
+        Set<String> identifierSet = new HashSet<>();
+        Set<String> operatorSet = new HashSet<>();
         this.tokenNo = 0;
         this.identifierNo = 0;
         this.operatorNo = 0;
-        if(sourceCodeTokens.get(1).getType()==38){
-            this.returnType = sourceCodeTokens.get(2).getText();
-        }else if(sourceCodeTokens.get(1).getText().equalsIgnoreCase("Override")){
-            this.returnType = sourceCodeTokens.get(3).getText();
-        }else{
-            this.returnType = sourceCodeTokens.get(1).getText();
-        }
          for (Token token : this.sourceCodeTokens) {
             String symbolicName = JavaLexer.VOCABULARY.getSymbolicName(token.getType());
             this.tokenNo++;
-            tokenSet.add(token);
+            tokenSet.add(token.getText());
             if (token.getType()==111) {
                 this.identifierNo++;
-                identifierSet.add(token);
+                identifierSet.add(token.getText());
             }
             if (token.getType() >= 70 && token.getType() <= 104){
                 this.operatorNo++;
-                operatorSet.add(token);
+                operatorSet.add(token.getText());
             }
         }
          this.uniqueTokenNo = tokenSet.size();
@@ -126,5 +120,20 @@ public class Method {
 
     public String getReturnType() {
         return returnType;
+    }
+
+    public String getMetricsAsString(){
+        String s = "Method Name : " + this.methodName +
+                "\nLine of Code : " + this.lineOfCode +
+                "\nReturn Type : " + this.returnType +
+                "\nFile Name : " + this.fileName +
+                "\nFile Path : " + this.filePath +
+                "\nToken No : " + this.tokenNo +
+                "\nIdentifier No : " + this.identifierNo +
+                "\nOperation No : " + this.operatorNo +
+                "\nUnique Token No : " + this.uniqueTokenNo +
+                "\nUnique Identifier No : " + this.uniqueIdentifierNo +
+                "\nUnique Operation No : " + this.uniqueOperatorNo;
+        return s;
     }
 }
