@@ -1,6 +1,4 @@
-import info.debatty.java.stringsimilarity.Damerau;
-import info.debatty.java.stringsimilarity.Jaccard;
-import info.debatty.java.stringsimilarity.NormalizedLevenshtein;
+import info.debatty.java.stringsimilarity.*;
 
 import static java.lang.Math.*;
 
@@ -29,7 +27,9 @@ public class MethodPair {
 
     private void computeMetrics(){
         NormalizedLevenshtein l = new NormalizedLevenshtein();
-        Damerau d = new Damerau();
+//        JaroWinkler jw = new JaroWinkler();
+//        Jaccard j = new Jaccard();
+//        NGram ngram = new NGram(2);
         this.diffTokenNo = abs(this.method1.getTokenNo()-this.method2.getTokenNo());
         this.diffUniqueTokenNo = abs(this.method1.getUniqueTokenNo()-this.method2.getUniqueTokenNo());
         this.diffIdentifierNo = abs(this.method1.getIdentifierNo()-this.method2.getIdentifierNo());
@@ -38,12 +38,13 @@ public class MethodPair {
         this.diffUniqueOperatorNo = abs(this.method1.getUniqueOperatorNo()-this.method2.getUniqueOperatorNo());
         this.diffTokenTypeDiversity = abs(this.method1.getTokenTypeDiversity()-this.method2.getTokenTypeDiversity());
         this.diffLOC = abs(this.method1.getLineOfCode()-this.method2.getLineOfCode());
-//        this.similarFileNameScore = l.distance(this.method1.getFileName(),this.method2.getFileName());
+        this.similarFileNameScore = l.distance(this.method1.getFileName(),this.method2.getFileName());
 //        this.similarFilePathScore = l.distance(this.method1.getFilePath(),this.method2.getFilePath());
-//        this.similarMethodNameScore = l.distance(this.method1.getMethodName(),this.method2.getMethodName());
-        this.similarFileNameScore = stringSimilarity(this.method1.getFileName(),this.method2.getFileName());
-        this.similarFilePathScore = stringSimilarity(this.method1.getFilePath(),this.method2.getFilePath());
-        this.similarMethodNameScore = stringSimilarity(this.method1.getMethodName(),this.method2.getMethodName());
+        this.similarMethodNameScore = l.distance(this.method1.getMethodName(),this.method2.getMethodName());
+//        this.similarMethodNameScore = jw.distance(this.method1.getMethodName(),this.method2.getMethodName());
+//        this.similarFileNameScore = stringSimilarity(this.method1.getFileName(),this.method2.getFileName());
+//        this.similarFilePathScore = stringSimilarity(this.method1.getFilePath(),this.method2.getFilePath());
+//        this.similarMethodNameScore = stringSimilarity(this.method1.getMethodName(),this.method2.getMethodName());
 
         if(this.method1.getReturnType().equals(this.method2.getReturnType())){
             this.isSameReturnType = true;

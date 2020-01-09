@@ -46,14 +46,17 @@ public class MerryEngine {
                 //with turn on and off control
                 int lineDiff = Math.abs(methodList.get(i).getLineOfCode()-methodList.get(j).getLineOfCode());
                 if (useSizeFilter == true) {
-                    if(lineDiff <= 3){
+                    int m1l = methodList.get(i).getTokenNo();
+                    int m2l = methodList.get(j).getTokenNo();
+                    double T = 0.8;
+                    if(m1l * T <= m2l && m2l <= m1l/T){
                         MethodPair methodPair = new MethodPair(methodList.get(i),methodList.get(j));
                         methodPairList.add(methodPair);
                     }
                 }else{
                     MethodPair methodPair = new MethodPair(methodList.get(i),methodList.get(j));
                     methodPairList.add(methodPair);
-                    //System.out.println("method name score of method "+methodPair.getMethod1().getMethodName()+" and "+methodPair.getMethod2().getMethodName()+" is "+methodPair.getSimilarMethodNameScore());
+//                    System.out.println("method name score of method "+methodPair.getMethod1().getMethodName()+" and "+methodPair.getMethod2().getMethodName()+" is "+methodPair.getSimilarMethodNameScore());
                 }
 
 
@@ -62,7 +65,7 @@ public class MerryEngine {
 //                System.out.println((i*methodList.size())+j);
             }
         }
-        System.out.println("Sample Metric ... \n" + methodList.get(2).getMetricsAsString());
+        System.out.println("Sample Metric ... \n" + methodList.get(5).getMetricsAsString());
         System.out.println("Method List size : " + methodList.size());
         System.out.println("Method Pair List size : " + methodPairList.size());
         Date endDate= new Date();

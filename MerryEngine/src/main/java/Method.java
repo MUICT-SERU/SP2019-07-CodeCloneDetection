@@ -3,6 +3,9 @@ import org.antlr.v4.runtime.Token;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.io.FileWriter;   // Import the FileWriter class
+import java.io.IOException;  // Import the IOException class to handle errors
+
 
 public class Method {
     private int startLine;
@@ -33,6 +36,7 @@ public class Method {
         this.lineOfCode = end - start;
         this.returnType = type;
         gatherMetrics();
+        writeFile(this.sourceCode);
     }
 
     private void gatherMetrics() throws Exception {
@@ -40,6 +44,7 @@ public class Method {
         Set<String> tokenSet = new HashSet<>();
         Set<String> identifierSet = new HashSet<>();
         Set<String> operatorSet = new HashSet<>();
+        Set<Integer> tokenTypeSet = new HashSet<>();
         this.tokenNo = 0;
         this.identifierNo = 0;
         this.operatorNo = 0;
@@ -47,20 +52,45 @@ public class Method {
             String symbolicName = JavaLexer.VOCABULARY.getSymbolicName(token.getType());
             this.tokenNo++;
             tokenSet.add(token.getText());
-            if (token.getType()==111) {
+            int tokenType = token.getType();
+            if(tokenType < 70 && tokenType > 104 && tokenType < 51 && tokenType > 60 && tokenType < 109 && tokenType > 111 && tokenType < 32 && tokenType > 35){
+                tokenTypeSet.add(tokenType);
+            }else if(tokenType >= 51 && tokenType <= 60){
+                tokenTypeSet.add(55);
+            }else if(tokenType >= 32 && tokenType <= 35){
+                tokenTypeSet.add(33);
+            }else if(tokenType >= 109 && tokenType <= 110){
+                tokenTypeSet.add(110);
+            }
+            if (tokenType==111) {
                 this.identifierNo++;
                 identifierSet.add(token.getText());
+                tokenTypeSet.add(111);
             }
-            if (token.getType() >= 70 && token.getType() <= 104){
+            if (tokenType >= 70 && tokenType <= 104){
                 this.operatorNo++;
                 operatorSet.add(token.getText());
+                tokenTypeSet.add(77);
             }
         }
+         this.tokenTypeDiversity = tokenTypeSet.size();
          this.uniqueTokenNo = tokenSet.size();
          this.uniqueIdentifierNo = identifierSet.size();
          this.uniqueOperatorNo = operatorSet.size();
     }
 
+    private void writeFile(String code){
+        try {
+            FileWriter myWriter = new FileWriter("/Users/sidekoiii/Documents/code2vec/Input.java");
+            myWriter.write(code);
+            myWriter.close();
+//            System.out.println("Successfully wrote to the file.");
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+
+    }
 
     public int getStartLine() {
         return startLine;
@@ -133,7 +163,8 @@ public class Method {
                 "\nOperation No : " + this.operatorNo +
                 "\nUnique Token No : " + this.uniqueTokenNo +
                 "\nUnique Identifier No : " + this.uniqueIdentifierNo +
-                "\nUnique Operation No : " + this.uniqueOperatorNo;
+                "\nUnique Operation No : " + this.uniqueOperatorNo +
+                "\nToken type diversity : " + this.tokenTypeDiversity;
         return s;
     }
 }
