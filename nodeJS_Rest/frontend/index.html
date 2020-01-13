@@ -48,7 +48,54 @@
       </div>
      <button type="submit" class="btn btn-primary">Submit</button>
     </form>
+<<<<<<< Updated upstream
 
+=======
+    <div align="center">
+    <br><h2>Or</h2><br><h4>Login with >>>
+<a href="https://github.com/login/oauth/authorize?client_id=31ec50555fca84725afa&redirect_uri=http://localhost:8001/oauth/redirect">GitHub</a>
+</h4>
+</div>
+<script>
+  //jquery for receive the url from a form
+  $(document).ready(function() {
+    //id = github
+    $("#github").submit(function (e) {
+      e.preventDefault();
+
+      const url = $('input[name="GitHubURL"]').val();
+      clone(url);
+
+    });
+  });
+
+  function clone(url) {
+
+    const data = {github: url};
+
+    const headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    };
+
+    const method = 'POST';
+
+    const body = JSON.stringify(data);
+
+    const payload = {
+      method,
+      headers,
+      body,
+    };
+
+    fetch('http://localhost:8001/api/clone', payload).then(async (res) => {
+      const data = await res.json();
+      console.log(data);
+    });
+  }
+
+</script>
+>>>>>>> Stashed changes
 </body>
 
 </html>

@@ -2,12 +2,26 @@ const express = require('express')
 // Import the axios library, to make HTTP requests
 const axios = require('axios')
 
+<<<<<<< Updated upstream
+=======
+const { exec, execFile } = require('child_process');
+>>>>>>> Stashed changes
 // const exec = require('child_process')
+
+const config = require('./config/config.js');
 
 const app = express()
 
+<<<<<<< Updated upstream
 const clientID = '31ec50555fca84725afa'
 const clientSecret = 'a3d38c40372c265b0942450d0ebf1c1d1dad54b1'
+=======
+app.use(bodyParser.json({ type: 'application/json' }))
+
+const clientID = `${global.gConfig.clientID}`;
+const clientSecret = `${global.gConfig.clientSecret}`;
+
+>>>>>>> Stashed changes
 // Declare the redirect route
 app.get('/oauth/redirect', (req, res) => {
   // The req.query object has the query params that
@@ -35,6 +49,7 @@ app.get('/oauth/redirect', (req, res) => {
 
 app.use(express.static(__dirname + '/frontend'))
 
+<<<<<<< Updated upstream
 // app.use(bodyParser.urlencoded({ extended: true }));
 
 // app.post('/urlcloning',(req,res) => {
@@ -49,8 +64,34 @@ app.use(express.static(__dirname + '/frontend'))
 //   res.send(alert(`stderr: ${stderr}`));
 //   })
 // })
+=======
+app.post('/api/clone', async function(req, res) {
+  // console.log(req.params.url)
+  console.log(req.body.github)
 
-//localhost 8001
-app.listen(8001,() => {
-  console.log("system listen to port 8001..");
+  res.json(req.body)
+
+  await exec('git clone '+`${req.body.github}`+' ./temp', (error, stdout, stderr) => {
+    if (error) {
+        console.error(`exec error: ${error}`);
+        return;
+      }
+      console.log(`stdout: ${stdout}`);
+      console.error(`stderr: ${stderr}`);
+
+    })
+>>>>>>> Stashed changes
+
+    await exec('java -jar simian-2.5.10.jar -reportDuplicateText ./temp/*.java',(error, stdout, stderr) => {
+      if (error) {
+          console.error(`exec error: ${error}`);
+          return;
+        }
+        console.log(`stdout: ${stdout}`);
+        console.error(`stderr: ${stderr}`);
 })
+})
+//localhost 8001
+app.listen(global.gConfig.node_port,() => {
+  console.log(`${global.gConfig.app_name} listening on port ${global.gConfig.node_port}`);
+});
