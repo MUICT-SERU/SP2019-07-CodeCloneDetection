@@ -42,7 +42,7 @@
 	</div>
 </nav>
 
-<a> Repositories</a>
+<a id="PageTitle"> Repositories</a>
 
 <table id="showRepos" class="table table-bordered" style="width:98%" align="center">
 	<thead>
@@ -77,6 +77,8 @@
 			// Write "Welcome <user name>" to the documents body
 			// const nameNode = document.createTextNode(`Welcome, ${res.name}`)
 			// document.body.appendChild(nameNode)
+			const NameOwner = document.getElementById('PageTitle').createTextNode(`${res[0].owner.login}`)
+			NameOwner.setAttribute("href", `${res[0].owner.url}`)
 			const tbl = document.getElementById('showRepos')
 			const tblBody = document.createElement('tbody')
 			var i = 0, j=0;
