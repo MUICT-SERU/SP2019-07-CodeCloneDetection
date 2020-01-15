@@ -14,11 +14,11 @@
 		margin:0;
 } */
 	</style>
-
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<title>Hello</title>
 </head>
 
@@ -42,7 +42,7 @@
 	</div>
 </nav>
 
-<a id="PageTitle"> Repositories</a>
+<a id="Repos"> Repositories</a>
 
 <table id="showRepos" class="table table-bordered" style="width:98%" align="center">
 	<thead>
@@ -77,8 +77,11 @@
 			// Write "Welcome <user name>" to the documents body
 			// const nameNode = document.createTextNode(`Welcome, ${res.name}`)
 			// document.body.appendChild(nameNode)
-			const NameOwner = document.getElementById('PageTitle').createTextNode(`${res[0].owner.login}`)
-			NameOwner.setAttribute("href", `${res[0].owner.url}`)
+
+			// const NameOwner = document.getElementById("Repos")
+			// NameOwner.createTextNode(`${res[0].owner.login}`)
+			// NameOwner.setAttribute("href", `${res[0].owner.url}`)
+
 			const tbl = document.getElementById('showRepos')
 			const tblBody = document.createElement('tbody')
 			var i = 0, j=0;
@@ -86,13 +89,15 @@
 				const tr = document.createElement('tr');
 			for(j = 0 ; j < 4 ; j++){
 
-
 				const count = document.createTextNode(i+1)
-				const reposName = document.createTextNode( `${res[i].name}`)
+				const reposName = document.createTextNode(`${res[i].name}`)
 				const reposCloneURL = document.createTextNode(`${res[i].clone_url}`)
 
+				const url = `${res[i].clone_url}`;
 				const ActionButton = document.createElement('button')
 				ActionButton.innerHTML = "Click to Analyze"
+				ActionButton.setAttribute("id","AnalyzeButton"+[i])
+				ActionButton.setAttribute("onclick","clone('"+url+"')")
 
 			  const td = document.createElement('td');
 				if(j==0){
@@ -114,7 +119,30 @@
 				tbl.appendChild(tblBody);
 
 		})
+		function clone(url) {
 
+			const data = {github: url};
+
+			const headers = {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+			};
+
+			const method = 'POST';
+
+			const body = JSON.stringify(data);
+
+			const payload = {
+				method,
+				headers,
+				body,
+			};
+
+			fetch('http://localhost:8001/api/clone', payload).then(async (res) => {
+				const data = await res.json();
+				console.log(data);
+			});
+		}
 </script>
 
 </html>
