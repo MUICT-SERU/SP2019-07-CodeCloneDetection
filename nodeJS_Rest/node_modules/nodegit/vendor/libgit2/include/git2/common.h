@@ -203,7 +203,9 @@ typedef enum {
 	GIT_OPT_ENABLE_UNSAVED_INDEX_SAFETY,
 	GIT_OPT_GET_PACK_MAX_OBJECTS,
 	GIT_OPT_SET_PACK_MAX_OBJECTS,
-	GIT_OPT_DISABLE_PACK_KEEP_FILE_CHECKS
+	GIT_OPT_DISABLE_PACK_KEEP_FILE_CHECKS,
+	GIT_OPT_SET_WINDOWS_LONGPATHS,
+	GIT_OPT_GET_WINDOWS_LONGPATHS
 } git_libgit2_opt_t;
 
 /**
@@ -396,6 +398,12 @@ typedef enum {
  *	 opts(GIT_OPT_DISABLE_PACK_KEEP_FILE_CHECKS, int enabled)
  *		> This will cause .keep file existence checks to be skipped when
  *		> accessing packfiles, which can help performance with remote filesystems.
+ *
+ *	 opts(GIT_OPT_SET_WINDOWS_LONGPATHS, int enabled)
+ *		> Set whether longpaths (paths > 260) are allowed on Windows.
+ *
+ *	 opts(GIT_OPT_GET_WINDOWS_LONGPATHS, int *enabled)
+ *		> Get whether longpaths (paths > 260) are allowed on Windows.
  *
  * @param option Option key
  * @param ... value to set the option

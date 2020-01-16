@@ -20,6 +20,7 @@
 	  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<title>Hello</title>
+
 </head>
 
 <body>
@@ -36,13 +37,13 @@
 <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
  <ul class="navbar-nav ml-auto" id="menu">
 					<li class="nav-item">
-							<b class="nav-link" href="" id="logout-button">Logout</b>
+							<b class="nav-link" href="" id="logout-button" onclick="logoutFunc()">Logout</b>
 					</li>
 				</ul>
 	</div>
 </nav>
 
-<a id="Repos"> Repositories</a>
+<a id="Repos"> Repositories </a>
 
 <table id="showRepos" class="table table-bordered" style="width:98%" align="center">
 	<thead>
@@ -58,7 +59,6 @@
  <br>
 </body>
 <script>
-
 	// We can get the token from the "access_token" query
 	// param, available in the browsers "location" global
 	const query = window.location.search.substring(1)
@@ -141,6 +141,11 @@
 			fetch('http://localhost:8001/api/clone', payload).then(async (res) => {
 				const data = await res.json();
 				console.log(data);
+			});
+		}
+		function logoutFunc(){
+			fetch('http://localhost:8001/api/logout', { method:"GET" }).then( async (res)=>{
+				alert("You have logout!");
 			});
 		}
 </script>

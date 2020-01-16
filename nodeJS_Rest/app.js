@@ -4,9 +4,8 @@ const axios = require('axios')
 
 var bodyParser = require('body-parser')
 
-const { exec, execFile } = require('child_process');
 
-// const exec = require('child_process')
+const exec = require('child_process').exec;
 
 const config = require('./config/config.js');
 
@@ -47,29 +46,25 @@ app.use(express.static(__dirname + '/frontend'))
 
 app.post('/api/clone', function(req, res) {
   // console.log(req.params.url)
-  console.log(req.body.github)
-
+  // console.log(req.body.github)
   res.json(req.body)
 
-  exec('git clone '+`${req.body.github}`+' ./temp', (error, stdout, stderr) => {
+  // var CloneRepos = exec('git clone '+`${req.body.github}`+' ./temp');
+  // var ExecTool = exec('java -jar simian-2.5.10.jar ./temp/*.java') ;
+  exec('git clone '+`${req.body.github}`+' ./temp && java -jar simian-2.5.10.jar ./temp/*.java ', (error, stdout, stderr) => {
     if (error) {
         console.error(`exec error: ${error}`);
         return;
       }
       console.log(`stdout: ${stdout}`);
       console.error(`stderr: ${stderr}`);
-
-    })
+    });
 
 })
-// , exec('java -jar simian-2.5.10.jar -reportDuplicateText ./temp/*.java',(error, stdout, stderr) => {
-//   if (error) {
-//       console.error(`exec error: ${error}`);
-//       return;
-//     }
-//     console.log(`stdout: ${stdout}`);
-//     console.error(`stderr: ${stderr}`);
-// })
+
+app.get('/api/logout', function(req, res){
+  res.redirect('/');
+});
 
 //localhost 8001
 app.listen(global.gConfig.node_port,() => {
