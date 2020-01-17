@@ -16,6 +16,7 @@
     "mongoose": "^5.8.7",
     "node-fetch": "^2.6.0",
     "nodegit": "^0.26.4",
+    "promise": "^8.0.3",
     "util": "^0.12.1"
   }
 }
