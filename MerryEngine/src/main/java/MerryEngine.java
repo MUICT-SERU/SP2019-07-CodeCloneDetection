@@ -27,18 +27,65 @@ public class MerryEngine {
 //            }
             methodList.addAll(new JavaMethodParser(f).parseMethod());
         }
-//        for(Method m : methodList){
-//            System.out.println(m.getSourceCode());
+        int id=1;
+        for(Method m : methodList){
+            m.setId(id);
+            id++;
+            m.writeFile();
+        }
+//        boolean readVector = false;
+//        String s = null;
+//        try {
+//
+//            // run the Unix "ps -ef" command
+//            // using the Runtime exec method:/
+//            Process p = Runtime.getRuntime().exec("python3 code2vec/code2vec.py --load code2vec/models/java14_model/saved_model_iter8.release --predict --export_code_vectors");
+//
+//            BufferedReader stdInput = new BufferedReader(new
+//                    InputStreamReader(p.getInputStream()));
+//
+//            BufferedReader stdError = new BufferedReader(new
+//                    InputStreamReader(p.getErrorStream()));
+//
+//            // read the output from the command
+//            System.out.println("Here is the standard output of the command:\n");
+//            while ((s = stdInput.readLine()) != null) {
+//                System.out.println(s);
+//
+//                if(s.contains("Code vector")){
+//                    readVector = true;
+//                }
+//            }
+//
+//            // read any errors from the attempted command
+//            System.out.println("Here is the standard error of the command (if any):\n");
+//            while ((s = stdError.readLine()) != null) {
+//                System.out.println(s);
+//            }
+//
+////            System.exit(0);
 //        }
-//        Method exampleMethod = methodList.get(10);
-//        System.out.println("Method 1 : "+ exampleMethod.getMethodName());
-//        System.out.println(exampleMethod.getFilePath()+"   "+exampleMethod.getStartLine()+"   "+exampleMethod.getEndLine());
-//        System.out.println(exampleMethod.getSourceCode());
-//        System.out.println("Method list size : "+methodList.size());
-//        System.out.println("Number of token : "+exampleMethod.getTokenNo()+" with unique : "+exampleMethod.getUniqueTokenNo());
-//        System.out.println("Number of Identifier : "+exampleMethod.getIdentifierNo()+" with unique : "+exampleMethod.getUniqueIdentifierNo());
-//        System.out.println("Number of Operator: "+exampleMethod.getOperatorNo()+" with unique : "+exampleMethod.getUniqueOperatorNo());
-//        System.out.println("Return Type : "+exampleMethod.getReturnType());
+//        catch (IOException e) {
+//            System.out.println("exception happened - here's what I know: ");
+//            e.printStackTrace();
+//            System.exit(-1);
+//        }
+        BufferedReader csvReader = new BufferedReader(new FileReader("/Users/sidekoiii/Documents/SP2019-DoNotCopy/MerryEngine/c2vVector.csv"));
+        String row;
+        while ((row = csvReader.readLine()) != null) {
+            String[] data = row.split(",");
+//            System.out.println(data[0]);
+            if(!data[0].equalsIgnoreCase("MethodID")){
+                Method methodToAssign = methodList.get(Integer.parseInt(data[0])-1);
+                if(Integer.parseInt(data[0]) == methodToAssign.getId()){
+                    methodToAssign.setCode2vecVector(data[1],cmd.getCode2vecSize());
+                }
+            }
+
+
+        }
+        csvReader.close();
+
         List<MethodPair> methodPairList = new ArrayList<MethodPair>();
         for(int i = 0 ; i < methodList.size();i++){
             for(int j=i+1 ; j<methodList.size();j++){
@@ -48,7 +95,7 @@ public class MerryEngine {
                 if (useSizeFilter == true) {
                     int m1l = methodList.get(i).getTokenNo();
                     int m2l = methodList.get(j).getTokenNo();
-                    double T = 0.8;
+                    double T = cmd.getSizeFilterThreshold();
                     if(m1l * T <= m2l && m2l <= m1l/T){
                         MethodPair methodPair = new MethodPair(methodList.get(i),methodList.get(j));
                         methodPairList.add(methodPair);
@@ -65,7 +112,7 @@ public class MerryEngine {
 //                System.out.println((i*methodList.size())+j);
             }
         }
-        System.out.println("Sample Metric ... \n" + methodList.get(5).getMetricsAsString());
+//        System.out.println("Sample Metric ... \n" + methodList.get(5).getMetricsAsString());
         System.out.println("Method List size : " + methodList.size());
         System.out.println("Method Pair List size : " + methodPairList.size());
         Date endDate= new Date();
