@@ -1,10 +1,12 @@
-const {exec} = require('child_process')
+let util = require('util')
+let exec = require('child_process').exec
+let exec_prom = util.promisify(exec)
 
-exec('git clone https://github.com/weekitaus/test.git ./test', (error, stdout, stderr) => {
-  if (error) {
-      console.error(`exec error: ${error}`);
-      return;
-    }
-    console.log(`stdout: ${stdout}`);
-    console.error(`stderr: ${stderr}`);
-  });
+exec_prom('ls').then(()=>{console.log('done')})
+
+
+async function doNext(){
+  await exec_prom('ls');
+  // do something after
+  console.log("This is my ip");
+}

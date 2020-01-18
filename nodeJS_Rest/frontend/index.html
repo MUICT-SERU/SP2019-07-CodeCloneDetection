@@ -15,7 +15,7 @@
   <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
@@ -42,13 +42,57 @@
     <b>Merry </b>
     <p>Code Clone Detection</p>
 
-    <form  align="center" action="http://localhost:8001/urlcloning" method="post">
+    <form  align="center" id="github">
       <div class="form-group"  align="center">
         <input type="url" class="form-control form-control-lg" name="GitHubURL" placeholder="Input GitHub URL" style="width:60%">
       </div>
      <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 
+    <div align="center">
+    <br><h2>Or</h2><br><h4>Login with >>>
+<a href="https://github.com/login/oauth/authorize?client_id=31ec50555fca84725afa&redirect_uri=http://localhost:8001/oauth/redirect">GitHub</a>
+</h4>
+</div>
+<script>
+  //jquery for receive the url from a form
+  $(document).ready(function() {
+    //id = github
+    $("#github").submit(function (e) {
+      e.preventDefault();
+
+      const url = $('input[name="GitHubURL"]').val();
+      clone(url);
+
+    });
+  });
+
+  function clone(url) {
+
+    const data = {github: url};
+
+    const headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    };
+
+    const method = 'POST';
+
+    const body = JSON.stringify(data);
+
+    const payload = {
+      method,
+      headers,
+      body,
+    };
+
+    fetch('http://localhost:8001/api/clone', payload).then(async (res) => {
+      const data = await res.json();
+      console.log(data);
+    });
+  }
+
+</script>
 </body>
 
 </html>

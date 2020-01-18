@@ -2,12 +2,20 @@ const express = require('express')
 // Import the axios library, to make HTTP requests
 const axios = require('axios')
 
-// const exec = require('child_process')
+var bodyParser = require('body-parser')
+
+const exec = require('child_process').exec;
+const execSync = require('child_process').execSync;
+
+const config = require('./config/config.js')
 
 const app = express()
 
-const clientID = '31ec50555fca84725afa'
-const clientSecret = 'a3d38c40372c265b0942450d0ebf1c1d1dad54b1'
+app.use(bodyParser.json({ type: 'application/json' }))
+
+const clientID = `${global.gConfig.clientID}`;
+const clientSecret = `${global.gConfig.clientSecret}`;
+
 // Declare the redirect route
 app.get('/oauth/redirect', (req, res) => {
   // The req.query object has the query params that
@@ -35,22 +43,36 @@ app.get('/oauth/redirect', (req, res) => {
 
 app.use(express.static(__dirname + '/frontend'))
 
-// app.use(bodyParser.urlencoded({ extended: true }));
 
-// app.post('/urlcloning',(req,res) => {
-//   console.log(`${req.body.GitHubURL}`);
-//   exec('git clone '+`${req.body.GitHubURL}`+' ./test',(error, stdout, stderr) => {
-//     if (error) {
-//     console.error(`exec error: ${error}`);
-//     return;
-//   }
-//   console.log(`stdout: ${stdout}`);
-//   console.error(`stderr: ${stderr}`);
-//   res.send(alert(`stderr: ${stderr}`));
-//   })
-// })
+app.post('/api/clone', function(req, res) {
+  // console.log(req.params.url)
+  // console.log(req.body.github)
+  res.json(req.body)
+
+  // var CloneRepos = exec('git clone '+`${req.body.github}`+' ./temp');
+  // var ExecTool = exec('java -jar simian-2.5.10.jar ./temp/*.java') ;
+  execSync('git clone '+`${req.body.github} ./temp`, (error, stdout, stderr) => {
+    if (error) {
+        console.error(`exec error: ${error}`);
+        return;
+      }
+      console.log(`stdout: ${stdout}`);
+      console.error(`stderr: ${stderr}`);
+    })
+    exec('java -jar simian-2.5.10.jar ./temp/*.java ', (error, stdout, stderr) => {
+      if (error) {
+          console.error(`exec error: ${error}`);
+          return;
+        }
+        console.log(`stdout: ${stdout}`);
+        console.error(`stderr: ${stderr}`);
+      });
+})
+// app.get('/api/logout', function(req, res){
+//   res.redirect('/');
+// });
 
 //localhost 8001
-app.listen(8001,() => {
-  console.log("system listen to port 8001..");
-})
+app.listen(global.gConfig.node_port,() => {
+  console.log(`${global.gConfig.app_name} listening on port ${global.gConfig.node_port}`);
+});
