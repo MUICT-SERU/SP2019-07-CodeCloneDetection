@@ -58,6 +58,7 @@ app.post('/api/clone', function(req, res) {
       }
       console.log(`stdout: ${stdout}`);
       console.error(`stderr: ${stderr}`);
+      finishCloning();
     })
     exec('java -jar simian-2.5.10.jar ./temp/*.java ', (error, stdout, stderr) => {
       if (error) {

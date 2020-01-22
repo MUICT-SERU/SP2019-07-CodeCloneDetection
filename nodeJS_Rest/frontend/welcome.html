@@ -7,15 +7,19 @@
 	padding-top: 50px;
 	padding-left: 25px;
 }
-
 	</style>
-	<meta charset="UTF-8">
+	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-
-	<title>Hello</title>
+		 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+		 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+		 <link href="styles.css" rel="stylesheet" />
 
 </head>
 
@@ -52,37 +56,42 @@
 </thead>
 </table>
 
- <br>
-
- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-
  <!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalCenter">
   Launch demo modal
 </button>
 
-<!-- Modal -->
-<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+<div class="modal fade" id="ModalCenter" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalCenterTitle">Modal title</h5>
+        <h3 class="modal-title" id="ModalCenterTitle">Processing please wait...</h3>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <p>Modal body text goes here.</p>
+
+				<div class="d-flex align-items-center">
+					 <strong style="font-size:16px" >Cloning from GitHub</strong>
+					 <div style="padding-right:30%">
+	<div class="circle-loader">
+	  <div class="checkmark draw"></div>
+	</div>
+</div>
+</div>
+	<div class="d-flex align-items-center" style="padding-top:3%">
+		<strong style="font-size:16px">Analyzing Clone</strong>
+<div class="circle-loader" >
+  <div class="checkmark draw"></div>
+</div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
+
+			<p><button id="toggle" type="button" class="btn btn-success">Toggle Completed</button></p>
     </div>
   </div>
 </div>
+
 
 </body>
 <script>
@@ -91,6 +100,10 @@
 	const query = window.location.search.substring(1)
 	const token = query.split('access_token=')[1]
 
+	$('#toggle').click(function() {
+	  $('.circle-loader').toggleClass('load-complete');
+	  $('.checkmark').toggle();
+	});
 
 	fetch('https://api.github.com/user',{
 		headers: new Headers({
@@ -198,7 +211,10 @@
 			alert("You have logout!");
 		});
 	}
-
+	function finishCloning(){
+		document.getElementById('CloneLoading').className = "d-none";
+	  const doneText = document.createTextNode('done')
+		document.appendChild(done)
+	}
 </script>
-
 </html>
