@@ -3,6 +3,7 @@ public class CommandLineArgument {
     private boolean sizeFilter = true;
     private double sizeFilterThreshold = 0.8;
     private int code2vecSize = 384;
+    private boolean training = false;
 
     public CommandLineArgument(String[] args){
         for(int i=0;i< args.length;i++) {
@@ -27,6 +28,11 @@ public class CommandLineArgument {
                     this.code2vecSize = 384;
                 }
             }
+            if(args[i].equalsIgnoreCase("-training")) {
+                if (args[i + 1].equalsIgnoreCase("on")) {
+                    this.training = true;
+                }
+            }
         }
     }
 
@@ -44,5 +50,9 @@ public class CommandLineArgument {
 
     public int getCode2vecSize(){
         return this.code2vecSize;
+    }
+
+    public boolean isTraining() {
+        return training;
     }
 }

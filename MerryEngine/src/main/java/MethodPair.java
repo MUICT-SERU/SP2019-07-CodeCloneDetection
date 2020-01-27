@@ -1,5 +1,5 @@
 import info.debatty.java.stringsimilarity.*;
-
+import java.util.Arrays;
 import static java.lang.Math.*;
 
 public class MethodPair {
@@ -17,19 +17,29 @@ public class MethodPair {
     private double similarFilePathScore;
     private double similarMethodNameScore;
     private boolean isSameReturnType;
-//    private double similarMethodNameScore2;
+    private double[] code2VecSimilarityScore = new double[12];
+    private boolean decision = Boolean.parseBoolean(null);
 
     public MethodPair(Method m1,Method m2){
         this.method1 = m1;
         this.method2 = m2;
         computeMetrics();
+        computeCode2VecSimilarity();
+    }
+
+    public MethodPair(Method m1,Method m2, boolean dec){
+        this.method1 = m1;
+        this.method2 = m2;
+        this.decision = dec;
+        computeMetrics();
+        computeCode2VecSimilarity();
+
     }
 
     private void computeMetrics(){
         NormalizedLevenshtein l = new NormalizedLevenshtein();
 //        JaroWinkler jw = new JaroWinkler();
 //        Jaccard j = new Jaccard();
-//        NGram ngram = new NGram(2);
         this.diffTokenNo = abs(this.method1.getTokenNo()-this.method2.getTokenNo());
         this.diffUniqueTokenNo = abs(this.method1.getUniqueTokenNo()-this.method2.getUniqueTokenNo());
         this.diffIdentifierNo = abs(this.method1.getIdentifierNo()-this.method2.getIdentifierNo());
@@ -41,7 +51,6 @@ public class MethodPair {
         this.similarFileNameScore = l.distance(this.method1.getFileName(),this.method2.getFileName());
 //        this.similarFilePathScore = l.distance(this.method1.getFilePath(),this.method2.getFilePath());
         this.similarMethodNameScore = l.distance(this.method1.getMethodName(),this.method2.getMethodName());
-//        this.similarMethodNameScore = jw.distance(this.method1.getMethodName(),this.method2.getMethodName());
 //        this.similarFileNameScore = stringSimilarity(this.method1.getFileName(),this.method2.getFileName());
 //        this.similarFilePathScore = stringSimilarity(this.method1.getFilePath(),this.method2.getFilePath());
 //        this.similarMethodNameScore = stringSimilarity(this.method1.getMethodName(),this.method2.getMethodName());
@@ -52,6 +61,42 @@ public class MethodPair {
             this.isSameReturnType = false;
         }
     }
+
+    private void computeCode2VecSimilarity(){
+//        double[] vecSim= new double[12];
+        double[] vec1 = method1.getCode2vecVector();
+        double[] vec2 = method2.getCode2vecVector();
+        int size = vec1.length/12;
+        int index = 0;
+        for(int i = 0 ; i<12 ; i++){
+            int beg = i*size , end = beg+size;
+            double[] v1 = Arrays.copyOfRange(vec1,beg,end);
+            double[] v2 = Arrays.copyOfRange(vec2,beg,end);
+            code2VecSimilarityScore[i] = cosineSimilarity(v1,v2);
+        }
+//        return vecSim;
+    }
+
+    private double cosineSimilarity(double vec1[],double vec2[])
+    {
+        double dop=0;
+        for (int n=0;n<vec1.length;n++)
+            dop +=vec1[n]*vec2[n] ;
+
+        double mag1=0.0,mag2=0.0;
+        for (int n=0;n<vec1.length;n++)
+        {
+            mag1 +=  Math.pow(vec1[n],2) ;
+            mag2 +=  Math.pow(vec2[n],2) ;
+        }
+
+        mag1=Math.sqrt(mag1);
+        mag2=Math.sqrt(mag2);
+
+        double csim = dop / (mag1 * mag2);
+        return csim;
+    }
+
     private double stringSimilarity(String s1,String s2){
         int s1l = s1.length();
         int s2l = s2.length();
@@ -122,6 +167,18 @@ public class MethodPair {
 
     public boolean isSameReturnType() {
         return isSameReturnType;
+    }
+
+    public void setDecision(boolean decision) {
+        this.decision = decision;
+    }
+
+    public boolean isDecision() {
+        return decision;
+    }
+
+    public double[] getCode2VecSimilarityScore() {
+        return code2VecSimilarityScore;
     }
 }
 

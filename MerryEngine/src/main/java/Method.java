@@ -27,7 +27,8 @@ public class Method {
     private int uniqueOperatorNo;
     private int tokenTypeDiversity;
     private String returnType;
-    private double[] code2vecVector;
+    private double[] code2vecVector ;
+    private boolean vectorSet;
 
 
     public Method(int start, int end, String path,String fileName, String code, String name,String type) throws Exception {
@@ -39,7 +40,9 @@ public class Method {
         this.methodName = name;
         this.lineOfCode = end - start;
         this.returnType = type;
+        this.vectorSet = false;
         gatherMetrics();
+//        setZeroCode2VecVector(384);
 //        System.out.println("code2vec Vector : \n"+this.code2vecVector);
     }
 
@@ -217,6 +220,21 @@ public class Method {
         for(int i=0 ;i<vec.length;i++){
             code2vecVector[i] = Double.parseDouble(vec[i]);
         }
+        vectorSet = true;
+    }
+    private void setZeroCode2VecVector(int size){
+        code2vecVector = new double[size];
+        for(int i = 0 ; i < size; i++){
+            code2vecVector[i] = 0.0000000;
+        }
+    }
+
+    public double[] getCode2vecVector() {
+        return code2vecVector;
+    }
+
+    public boolean isVectorSet() {
+        return vectorSet;
     }
 
     public String getMetricsAsString(){
