@@ -13,10 +13,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class JavaMethodParser {
     private List<Method> methodList = new ArrayList<Method>();
+    private HashMap<MultiKey,Method> methodHashMap= new HashMap<>();
     private String path;
 
     private String fileName;
@@ -28,7 +30,7 @@ public class JavaMethodParser {
         String[] fn = file.split("\\.");
         fileName = fn[0];
     }
-    public List<Method> parseMethod() throws IOException {
+    public HashMap<MultiKey,Method> parseMethod() throws IOException {
         try{
             FileInputStream in = new FileInputStream(this.path);
             CompilationUnit cu;
@@ -51,7 +53,7 @@ public class JavaMethodParser {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        return methodList;
+        return methodHashMap;
     }
 
     private class MethodVisitor extends VoidVisitorAdapter {
@@ -69,12 +71,15 @@ public class JavaMethodParser {
                 end = n.getEnd().get().line;
             }
             Method m = null;
+            MultiKey mk = null;
             try {
                 m = new Method(start,end,path,fileName,n.toString(ppc),n.getName().asString(),n.getTypeAsString());
+                mk = new MultiKey(fileName,start,end);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            methodList.add(m);
+//            methodList.add(m);
+            methodHashMap.put(mk,m);
             super.visit(n,arg);
         }
     }
@@ -94,12 +99,15 @@ public class JavaMethodParser {
                 end = c.getEnd().get().line;
             }
             Method m = null;
+            MultiKey mk = null;
             try {
                 m = new Method(start,end,path,fileName,c.toString(ppc),c.getName().asString(),"Constructor");
+                mk = new MultiKey(fileName,start,end);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            methodList.add(m);
+//            methodList.add(m);
+            methodHashMap.put(mk,m);
             super.visit(c,arg);
         }
     }

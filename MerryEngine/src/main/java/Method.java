@@ -10,6 +10,7 @@ import java.io.IOException;  // Import the IOException class to handle errors
 
 
 public class Method {
+    private int id;
     private int startLine;
     private int endLine;
     private String filePath;
@@ -26,7 +27,8 @@ public class Method {
     private int uniqueOperatorNo;
     private int tokenTypeDiversity;
     private String returnType;
-    private String code2vecVector;
+    private double[] code2vecVector ;
+    private boolean vectorSet;
 
 
     public Method(int start, int end, String path,String fileName, String code, String name,String type) throws Exception {
@@ -38,10 +40,10 @@ public class Method {
         this.methodName = name;
         this.lineOfCode = end - start;
         this.returnType = type;
+        this.vectorSet = false;
         gatherMetrics();
-        writeFile(this.sourceCode);
-        this.code2vecVector = executeCode2Vec();
-        System.out.println("code2vec Vector : \n"+this.code2vecVector);
+//        setZeroCode2VecVector(384);
+//        System.out.println("code2vec Vector : \n"+this.code2vecVector);
     }
 
     private void gatherMetrics() throws Exception {
@@ -58,24 +60,24 @@ public class Method {
             this.tokenNo++;
             tokenSet.add(token.getText());
             int tokenType = token.getType();
-            if(tokenType < 70 && tokenType > 104 && tokenType < 51 && tokenType > 60 && tokenType < 109 && tokenType > 111 && tokenType < 32 && tokenType > 35){
+            if(tokenType < JavaLexer.ASSIGN && tokenType > JavaLexer.ARROW && tokenType < JavaLexer.DECIMAL_LITERAL && tokenType > JavaLexer.NULL_LITERAL && tokenType < JavaLexer.COMMENT && tokenType > JavaLexer.IDENTIFIER && tokenType < JavaLexer.PRIVATE && tokenType > JavaLexer.PUBLIC){
                 tokenTypeSet.add(tokenType);
-            }else if(tokenType >= 51 && tokenType <= 60){
-                tokenTypeSet.add(55);
-            }else if(tokenType >= 32 && tokenType <= 35){
-                tokenTypeSet.add(33);
-            }else if(tokenType >= 109 && tokenType <= 110){
-                tokenTypeSet.add(110);
+            }else if(tokenType >= JavaLexer.DECIMAL_LITERAL && tokenType <= JavaLexer.NULL_LITERAL){
+                tokenTypeSet.add(JavaLexer.NULL_LITERAL);
+            }else if(tokenType >= JavaLexer.PRIVATE && tokenType <= JavaLexer.PUBLIC){
+                tokenTypeSet.add(JavaLexer.PUBLIC);
+            }else if(tokenType >= JavaLexer.COMMENT && tokenType <= JavaLexer.LINE_COMMENT){
+                tokenTypeSet.add(JavaLexer.COMMENT);
             }
-            if (tokenType==111) {
+            if (tokenType==JavaLexer.IDENTIFIER) {
                 this.identifierNo++;
                 identifierSet.add(token.getText());
-                tokenTypeSet.add(111);
+                tokenTypeSet.add(JavaLexer.IDENTIFIER);
             }
-            if (tokenType >= 70 && tokenType <= 104){
+            if (tokenType >= JavaLexer.ASSIGN && tokenType <= JavaLexer.ARROW){
                 this.operatorNo++;
                 operatorSet.add(token.getText());
-                tokenTypeSet.add(77);
+                tokenTypeSet.add(JavaLexer.ASSIGN);
             }
         }
          this.tokenTypeDiversity = tokenTypeSet.size();
@@ -84,12 +86,12 @@ public class Method {
          this.uniqueOperatorNo = operatorSet.size();
     }
 
-    private void writeFile(String code){
+    public void writeFile(){
         try {
-            FileWriter myWriter = new FileWriter("Input.java");
-            myWriter.write(code);
+            FileWriter myWriter = new FileWriter("JavaMethods/"+id+".java");
+            myWriter.write(this.sourceCode);
             myWriter.close();
-            System.out.println("Successfully wrote to the file.");
+//            System.out.println("Successfully wrote to the file.");
         } catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
@@ -142,6 +144,14 @@ public class Method {
             System.exit(-1);
         }
         return vector;
+    }
+
+    public void setId(int ID){
+        this.id = ID;
+    }
+
+    public int getId(){
+        return this.id;
     }
 
     public int getStartLine() {
@@ -202,6 +212,29 @@ public class Method {
 
     public String getReturnType() {
         return returnType;
+    }
+
+    public void setCode2vecVector(String vector,int size) {
+        code2vecVector = new double[size];
+        String[] vec = vector.split(" ");
+        for(int i=0 ;i<vec.length;i++){
+            code2vecVector[i] = Double.parseDouble(vec[i]);
+        }
+        vectorSet = true;
+    }
+    private void setZeroCode2VecVector(int size){
+        code2vecVector = new double[size];
+        for(int i = 0 ; i < size; i++){
+            code2vecVector[i] = 0.0000000;
+        }
+    }
+
+    public double[] getCode2vecVector() {
+        return code2vecVector;
+    }
+
+    public boolean isVectorSet() {
+        return vectorSet;
     }
 
     public String getMetricsAsString(){
