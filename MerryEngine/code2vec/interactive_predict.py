@@ -60,15 +60,15 @@ class InteractivePredictor:
     #         return
 
     def predict(self):
-        basepath = '/Users/sidekoiii/Documents/SP2019-DoNotCopy/MerryEngine/JavaMethods/'
+        basepath = '/Users/sidekoiii/Documents/GitHub/SP2019-DoNotCopy/MerryEngine/JavaMethods/'
         path, dirs, files = next(os.walk(basepath))
         file_count = len(files)
         print(file_count)
-        with open('/Users/sidekoiii/Documents/SP2019-DoNotCopy/MerryEngine/c2vVector2.csv', 'w', newline='') as file:
+        files = os.listdir(basepath)
+        with open('/Users/sidekoiii/Documents/GitHub/SP2019-DoNotCopy/MerryEngine/c2vVector.csv', 'w', newline='') as file:
             writer = csv.writer(file)
-            for i in range(1, file_count):
-                input_filename = '/Users/sidekoiii/Documents/SP2019-DoNotCopy/MerryEngine/JavaMethods/' + str(
-                    i) + '.java'
+            for file in files:
+                input_filename = '/Users/sidekoiii/Documents/GitHub/SP2019-DoNotCopy/MerryEngine/JavaMethods/' + str(file) + '.java'
                 # print('Starting interactive prediction...on ' + str(i) + '.java')
                 try:
                     predict_lines, hash_to_string_dict = self.path_extractor.extract_paths(input_filename)
@@ -88,7 +88,7 @@ class InteractivePredictor:
                     #     print('%f\tcontext: %s,%s,%s' % (
                     #     attention_obj['score'], attention_obj['token1'], attention_obj['path'], attention_obj['token2']))
                     if self.config.EXPORT_CODE_VECTORS:
-                        writer.writerow([str(i), ' '.join(map(str, raw_prediction.code_vector))])
+                        writer.writerow([str(file), ' '.join(map(str, raw_prediction.code_vector))])
                     # print('Code vector:')
                     # print(' '.join(map(str, raw_prediction.code_vector)))
         file.close()

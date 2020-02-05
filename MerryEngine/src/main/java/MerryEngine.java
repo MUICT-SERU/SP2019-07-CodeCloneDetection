@@ -24,12 +24,12 @@ public class MerryEngine {
 //            methodList.addAll(new JavaMethodParser(f).parseMethod());
             methodHashMap.putAll(new JavaMethodParser(f).parseMethod());
         }
-        int id=1;
+//        int id=1;
         for (Map.Entry<String, Method> entry : methodHashMap.entrySet()) {
             Method m = entry.getValue();
-            m.setId(id);
-            id++;
-            methodList.add(m);
+//            m.setId(id);
+//            id++;
+//            methodList.add(m);
             m.writeFile();
         }
         System.out.println("Done Write files");
@@ -74,22 +74,19 @@ public class MerryEngine {
         String row;
         while ((row = csvReader.readLine()) != null) {
             String[] data = row.split(",");
-            Method methodToAssign = methodList.get(Integer.parseInt(data[0])-1);
-            if(Integer.parseInt(data[0]) == methodToAssign.getId()){
-                methodToAssign.setCode2vecVector(data[1],cmd.getCode2vecSize());
-                Method methodFromHash = methodHashMap.get(methodToAssign.getFileName()+methodToAssign.getStartLine()+methodToAssign.getEndLine());
-                methodFromHash.setCode2vecVector(data[1],cmd.getCode2vecSize());
-            }
+//            Method methodToAssign = methodList.get(Integer.parseInt(data[0])-1);
+            Method methodToAssign = methodHashMap.get(data[0]);
+            methodToAssign.setCode2vecVector(data[1],cmd.getCode2vecSize());
         }
         csvReader.close();
         List<Method> removeList = new ArrayList<>();
-        for(Method rm : methodList){
+        for(Map.Entry<String, Method> entry : methodHashMap.entrySet()){
+            Method rm = entry.getValue();
             if(rm.isVectorSet()==false){
-                removeList.add(rm);
+                methodHashMap.remove(rm);
             }
         }
-        methodList.removeAll(removeList);
-        System.out.println("Method List size : " + methodList.size());
+        System.out.println("Method hash size : " + methodHashMap.size());
       //method paring
         List<MethodPair> methodPairList = new ArrayList<MethodPair>();
         if(cmd.isTraining()){
@@ -115,16 +112,18 @@ public class MerryEngine {
                 }
             }
         }else {
+            for (Map.Entry<String, Method> entry : methodHashMap.entrySet()) {
+                methodList.add(entry.getValue());
+            }
             for(int i = 0 ; i < methodList.size();i++){
                 for(int j=i+1 ; j< methodList.size();j++){
                     //size filter
                     //with turn on and off control
                     if (useSizeFilter == true) {
-                        int m1l = methodList.get(i).getTokenNo();
-                        int m2l = methodList.get(j).getTokenNo();
+                        int m1Tokens = methodList.get(i).getTokenNo();
+                        int m2Tokens = methodList.get(j).getTokenNo();
                         double T = cmd.getSizeFilterThreshold();
-                        if(m1l * T <= m2l && m2l <= m1l/T){
-//                            System.out.println(methodList.get(i).getId()+" and "+methodList.get(j).getId());
+                        if(m1Tokens * T <= m2Tokens && m2Tokens <= m1Tokens/T){
                             MethodPair methodPair = new MethodPair(methodList.get(i),methodList.get(j));
                             methodPairList.add(methodPair);
                         }
