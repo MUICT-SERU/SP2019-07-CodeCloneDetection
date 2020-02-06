@@ -13,11 +13,18 @@
 }
   </style>
   <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <!-- Bootstrap CSS -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+     <link href="styles.css" rel="stylesheet" />
 </head>
 <body>
     <nav class="navbar navbar-expand-md navbar-light bg-light">
@@ -31,7 +38,7 @@
           </ul>
         </div>
  <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
-   <ul class="navbar-nav ml-auto">
+   <ul class="nav justify-content-end" id="menu" style="padding-left:83%">
             <li class="nav-item">
                 <a class="nav-link" href="https://github.com/login/oauth/authorize?client_id=31ec50555fca84725afa&redirect_uri=http://localhost:8001/oauth/redirect">Login with GitHub</a>
             </li>
@@ -48,19 +55,52 @@
       </div>
      <button type="submit" class="btn btn-primary">Submit</button>
     </form>
-
     <div align="center">
     <br><h2>Or</h2><br><h4>Login with >>>
 <a href="https://github.com/login/oauth/authorize?client_id=31ec50555fca84725afa&redirect_uri=http://localhost:8001/oauth/redirect">GitHub</a>
 </h4>
+</div>
+
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalCenter" id="btnTrigger" style="display:none">
+  Launch demo modal
+</button>
+
+<div class="modal fade" id="ModalCenter" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="ModalCenterTitle">Processing please wait...</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+				<div class="d-flex align-items-center">
+					 <strong style="font-size:16px" >Cloning from GitHub</strong>
+					 <div style="padding-right:30%">
+	<div class="circle-loader">
+	  <div class="checkmark draw"></div>
+	</div>
+</div>
+</div>
+	<div class="d-flex align-items-center" style="padding-top:3%">
+		<strong style="font-size:16px">Analyzing Clone</strong>
+<div class="circle-loader" >
+  <div class="checkmark draw"></div>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
 </div>
 <script>
   //jquery for receive the url from a form
   $(document).ready(function() {
     //id = github
     $("#github").submit(function (e) {
+          $('#btnTrigger').click();
       e.preventDefault();
-
       const url = $('input[name="GitHubURL"]').val();
       clone(url);
 
