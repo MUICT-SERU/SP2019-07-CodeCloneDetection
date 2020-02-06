@@ -1,13 +1,6 @@
 <html lang="en">
 
 <head>
-	<style>
-	a {
-	font-size: 50;
-	padding-top: 50px;
-	padding-left: 25px;
-}
-	</style>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -31,20 +24,21 @@
 								<img src="/images/logo.png" alt="Merry's logo" style="width:70px;height:70px;">
 							</a>
 					</li>
-				</ul>
-			</div>
- <ul class="nav justify-content-end" id="menu" style="padding-left:87%">
-	 	<li class="nav-item"id="ProPic" style="padding-right:">
+				<li class="nav-item" style="padding-top:15%">
+						<a class="nav-link" href="/Result.html">Result</a>
+				</li>
+			</ul>
+ <ul class="nav justify-content-end" id="menu" style="padding-left:83%">
+	 	<li class="nav-item"id="ProPic">
 
 		</li>
 					<li class="nav-item">
-							<b class="nav-link" id="logout-button" onclick="logoutFunc()" style="padding-top:30%">Logout</b>
+							<b class="nav-link" id="logout-button" onclick="logoutFunc()" style="padding-top:35%">Logout</b>
 					</li>
 				</ul>
-	</div>
 </nav>
 
-<a id="Repos"> Repositories of </a>
+<a id="Repos" style="font-size: 50;padding-top: 50px;padding-left: 25px;"> Repositories of </a>
 <table id="showRepos" class="table table-bordered" style="width:98%" align="center">
 	<thead>
 <tr>
@@ -63,7 +57,7 @@
 
 <div class="modal fade" id="ModalCenter" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
+    <div class="modal-content" width='300%' height='300%'>
       <div class="modal-header">
         <h3 class="modal-title" id="ModalCenterTitle">Processing please wait...</h3>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -91,7 +85,7 @@
     </div>
   </div>
 </div>
-
+</div>
 
 </body>
 <script>
@@ -104,6 +98,7 @@
 	  $('.circle-loader').toggleClass('load-complete');
 	  $('.checkmark').toggle();
 	});
+
 
 	fetch('https://api.github.com/user',{
 		headers: new Headers({
@@ -154,6 +149,8 @@
 				const ActionButton = document.createElement('button')
 				ActionButton.innerHTML = "Click to Analyze"
 				ActionButton.setAttribute("id","AnalyzeButton"+[i])
+				ActionButton.setAttribute("data-toggle" , "modal")
+				ActionButton.setAttribute("data-target", "#ModalCenter")
 				ActionButton.setAttribute("onclick","clone('"+url+"')")
 
 				const ResultButton = document.createElement('button')
@@ -204,17 +201,17 @@
 		fetch('http://localhost:8001/api/clone', payload).then(async (res) => {
 			const data = await res.json();
 			console.log(data);
-		});
+		}).then(res=> {
+			if(res.status == '200'){
+				console.log('status:ok');
+			}
+		})
 	}
 	function logoutFunc(){
 		fetch('http://localhost:8001/api/logout', { method:"GET" }).then( async (res)=>{
 			alert("You have logout!");
 		});
 	}
-	function finishCloning(){
-		document.getElementById('CloneLoading').className = "d-none";
-	  const doneText = document.createTextNode('done')
-		document.appendChild(done)
-	}
+
 </script>
 </html>
