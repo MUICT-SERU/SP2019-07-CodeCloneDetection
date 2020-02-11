@@ -10,7 +10,7 @@ import java.io.IOException;  // Import the IOException class to handle errors
 
 
 public class Method {
-    private int id;
+    private String id;
     private int startLine;
     private int endLine;
     private String filePath;
@@ -41,6 +41,7 @@ public class Method {
         this.lineOfCode = end - start;
         this.returnType = type;
         this.vectorSet = false;
+        this.id = fileName+start+end;
         gatherMetrics();
 //        setZeroCode2VecVector(384);
 //        System.out.println("code2vec Vector : \n"+this.code2vecVector);
@@ -144,14 +145,6 @@ public class Method {
             System.exit(-1);
         }
         return vector;
-    }
-
-    public void setId(int ID){
-        this.id = ID;
-    }
-
-    public int getId(){
-        return this.id;
     }
 
     public int getStartLine() {

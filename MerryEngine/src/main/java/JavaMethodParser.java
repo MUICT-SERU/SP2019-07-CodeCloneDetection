@@ -18,7 +18,7 @@ import java.util.List;
 
 public class JavaMethodParser {
     private List<Method> methodList = new ArrayList<Method>();
-    private HashMap<MultiKey,Method> methodHashMap= new HashMap<>();
+    private HashMap<String,Method> methodHashMap= new HashMap<>();
     private String path;
 
     private String fileName;
@@ -30,7 +30,7 @@ public class JavaMethodParser {
         String[] fn = file.split("\\.");
         fileName = fn[0];
     }
-    public HashMap<MultiKey,Method> parseMethod() throws IOException {
+    public HashMap<String,Method> parseMethod() throws IOException {
         try{
             FileInputStream in = new FileInputStream(this.path);
             CompilationUnit cu;
@@ -74,12 +74,11 @@ public class JavaMethodParser {
             MultiKey mk = null;
             try {
                 m = new Method(start,end,path,fileName,n.toString(ppc),n.getName().asString(),n.getTypeAsString());
-                mk = new MultiKey(fileName,start,end);
             } catch (Exception e) {
                 e.printStackTrace();
             }
 //            methodList.add(m);
-            methodHashMap.put(mk,m);
+            methodHashMap.put(fileName+start+end,m);
             super.visit(n,arg);
         }
     }
@@ -107,7 +106,7 @@ public class JavaMethodParser {
                 e.printStackTrace();
             }
 //            methodList.add(m);
-            methodHashMap.put(mk,m);
+            methodHashMap.put(fileName+start+end,m);
             super.visit(c,arg);
         }
     }

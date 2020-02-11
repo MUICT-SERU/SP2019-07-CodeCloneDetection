@@ -18,110 +18,112 @@ public class MerryEngine {
         List<String> fileList = new ArrayList<String>();
         search(".*\\.java", folder, fileList);
         List<Method> methodList = new ArrayList<Method>();
-        HashMap<MultiKey,Method> methodHashMap = new HashMap<>();
+        HashMap<String,Method> methodHashMap = new HashMap<>();
         System.out.println("Java files : "+fileList.size());
         for (String f : fileList) {
-//            File file = new File(s);
-//            BufferedReader br = new BufferedReader(new FileReader(file));
-//            String st;
-//            while ((st = br.readLine()) != null){
-//                System.out.println(st);
-//            }
 //            methodList.addAll(new JavaMethodParser(f).parseMethod());
             methodHashMap.putAll(new JavaMethodParser(f).parseMethod());
         }
-        int id=1;
-        for (Map.Entry<MultiKey, Method> entry : methodHashMap.entrySet()) {
+//        int id=1;
+        for (Map.Entry<String, Method> entry : methodHashMap.entrySet()) {
             Method m = entry.getValue();
-            m.setId(id);
-            id++;
-            methodList.add(m);
+//            m.setId(id);
+//            id++;
+//            methodList.add(m);
             m.writeFile();
         }
-        boolean readVector = false;
-        String s = null;
-        try {
+        System.out.println("Done Write files");
+//        boolean readVector = false;
+//        String s = null;
+//        try {
+//
+//            // run the Unix "ps -ef" command
+//            // using the Runtime exec method:/
+//            Process p = Runtime.getRuntime().exec("python3 code2vec/code2vec.py --load code2vec/models/java14_model/saved_model_iter8.release --predict --export_code_vectors");
+//
+//            BufferedReader stdInput = new BufferedReader(new
+//                    InputStreamReader(p.getInputStream()));
+//
+//            BufferedReader stdError = new BufferedReader(new
+//                    InputStreamReader(p.getErrorStream()));
+//
+//            // read the output from the command
+//            System.out.println("Here is the standard output of the command:\n");
+//            while ((s = stdInput.readLine()) != null) {
+//                System.out.println(s);
+//
+//                if(s.contains("Code vector")){
+//                    readVector = true;
+//                }
+//            }
+//
+//            // read any errors from the attempted command
+//            System.out.println("Here is the standard error of the command (if any):\n");
+//            while ((s = stdError.readLine()) != null) {
+//                System.out.println(s);
+//            }
+//
+//        }
+//        catch (IOException e) {
+//            System.out.println("exception happened - here's what I know: ");
+//            e.printStackTrace();
+//            System.exit(-1);
+//        }
 
-            // run the Unix "ps -ef" command
-            // using the Runtime exec method:/
-            Process p = Runtime.getRuntime().exec("python3 code2vec/code2vec.py --load code2vec/models/java14_model/saved_model_iter8.release --predict --export_code_vectors");
-
-            BufferedReader stdInput = new BufferedReader(new
-                    InputStreamReader(p.getInputStream()));
-
-            BufferedReader stdError = new BufferedReader(new
-                    InputStreamReader(p.getErrorStream()));
-
-            // read the output from the command
-            System.out.println("Here is the standard output of the command:\n");
-            while ((s = stdInput.readLine()) != null) {
-                System.out.println(s);
-
-                if(s.contains("Code vector")){
-                    readVector = true;
-                }
-            }
-
-            // read any errors from the attempted command
-            System.out.println("Here is the standard error of the command (if any):\n");
-            while ((s = stdError.readLine()) != null) {
-                System.out.println(s);
-            }
-
-        }
-        catch (IOException e) {
-            System.out.println("exception happened - here's what I know: ");
-            e.printStackTrace();
-            System.exit(-1);
-        }
-
-        BufferedReader csvReader = new BufferedReader(new FileReader("/Users/sidekoiii/Documents/SP2019-DoNotCopy/MerryEngine/c2vVector.csv"));
+        BufferedReader csvReader = new BufferedReader(new FileReader("/home/sp2019-07/SP2019-DoNotCopy/MerryEngine/c2vVector.csv"));
         String row;
         while ((row = csvReader.readLine()) != null) {
             String[] data = row.split(",");
-            Method methodToAssign = methodList.get(Integer.parseInt(data[0])-1);
-            if(Integer.parseInt(data[0]) == methodToAssign.getId()){
-                methodToAssign.setCode2vecVector(data[1],cmd.getCode2vecSize());
-            }
+//            Method methodToAssign = methodList.get(Integer.parseInt(data[0])-1);
+            Method methodToAssign = methodHashMap.get(data[0]);
+            methodToAssign.setCode2vecVector(data[1],cmd.getCode2vecSize());
         }
         csvReader.close();
         List<Method> removeList = new ArrayList<>();
-        for(Method rm : methodList){
+        for(Map.Entry<String, Method> entry : methodHashMap.entrySet()){
+            Method rm = entry.getValue();
             if(rm.isVectorSet()==false){
-                removeList.add(rm);
+                methodHashMap.remove(rm);
             }
         }
-        methodList.removeAll(removeList);
-        System.out.println("Method List size : " + methodList.size());
+        System.out.println("Method hash size : " + methodHashMap.size());
       //method paring
         List<MethodPair> methodPairList = new ArrayList<MethodPair>();
         if(cmd.isTraining()){
-            BufferedReader csvTrainingTrueReader = new BufferedReader(new FileReader("/Users/sidekoiii/Documents/SP2019-DoNotCopy/SelectedClones.csv"));
+            BufferedReader csvTrainingTrueReader = new BufferedReader(new FileReader("/home/sp2019-07/SelectedClones.csv"));
             String pair;
             while ((pair = csvTrainingTrueReader.readLine()) != null) {
-                String[] data = row.split(",");
-                Method m1 = methodHashMap.get(new MultiKey(data[0],Integer.parseInt(data[1]),Integer.parseInt(data[2])));
-                Method m2 = methodHashMap.get(new MultiKey(data[3],Integer.parseInt(data[4]),Integer.parseInt(data[5])));
-                methodPairList.add(new MethodPair(m1,m2,true));
+                String[] data = pair.split(",");
+                Method m1 = methodHashMap.get(data[0]+data[1]+data[2]);
+                System.out.println("Method 1 : "+ m1.toString());
+                Method m2 = methodHashMap.get(data[4]+data[5]+data[6]);
+                System.out.println("Method 2 : "+ m2.toString());
+                if(m1!=null&&m2!=null){
+                    methodPairList.add(new MethodPair(m1,m2,true));
+                }
             }
-            BufferedReader csvTrainingFalseReader = new BufferedReader(new FileReader("/Users/sidekoiii/Documents/SP2019-DoNotCopy/SelectedFalseClones.csv"));
+            BufferedReader csvTrainingFalseReader = new BufferedReader(new FileReader("/home/sp2019-07/SelectedFalseClones.csv"));
             while ((pair = csvTrainingTrueReader.readLine()) != null) {
-                String[] data = row.split(",");
+                String[] data = pair.split(",");
                 Method m1 = methodHashMap.get(new MultiKey(data[0],Integer.parseInt(data[1]),Integer.parseInt(data[2])));
-                Method m2 = methodHashMap.get(new MultiKey(data[3],Integer.parseInt(data[4]),Integer.parseInt(data[5])));
-                methodPairList.add(new MethodPair(m1,m2,false));
+                Method m2 = methodHashMap.get(new MultiKey(data[4],Integer.parseInt(data[5]),Integer.parseInt(data[6])));
+                if(m1!=null&&m2!=null){
+                    methodPairList.add(new MethodPair(m1,m2,false));
+                }
             }
         }else {
+            for (Map.Entry<String, Method> entry : methodHashMap.entrySet()) {
+                methodList.add(entry.getValue());
+            }
             for(int i = 0 ; i < methodList.size();i++){
                 for(int j=i+1 ; j< methodList.size();j++){
                     //size filter
                     //with turn on and off control
                     if (useSizeFilter == true) {
-                        int m1l = methodList.get(i).getTokenNo();
-                        int m2l = methodList.get(j).getTokenNo();
+                        int m1Tokens = methodList.get(i).getTokenNo();
+                        int m2Tokens = methodList.get(j).getTokenNo();
                         double T = cmd.getSizeFilterThreshold();
-                        if(m1l * T <= m2l && m2l <= m1l/T){
-//                            System.out.println(methodList.get(i).getId()+" and "+methodList.get(j).getId());
+                        if(m1Tokens * T <= m2Tokens && m2Tokens <= m1Tokens/T){
                             MethodPair methodPair = new MethodPair(methodList.get(i),methodList.get(j));
                             methodPairList.add(methodPair);
                         }
@@ -134,7 +136,7 @@ public class MerryEngine {
             }
         }
 if(cmd.isTraining()){
-    FileWriter csvWriter = new FileWriter("/Users/sidekoiii/Documents/SP2019-DoNotCopy/MerryEngine/mertics.csv");
+    FileWriter csvWriter = new FileWriter("/home/sp2019-07/SP2019-DoNotCopy/MerryEngine/mertics.csv");
     csvWriter.append("DiffLOC");
     csvWriter.append(",");
     csvWriter.append("DiffIdentifierNo");
@@ -162,9 +164,9 @@ if(cmd.isTraining()){
         csvWriter.append(",");
     }
     csvWriter.append("Decision");
-    csvWriter.append("\n");
     for (int i = 0; i<methodPairList.size();i++){
         MethodPair mp = methodPairList.get(i);
+        csvWriter.append("\n ");
         csvWriter.append(mp.getDiffLOC()+"");
         csvWriter.append(",");
         csvWriter.append(mp.getDiffIdentifierNo()+"");
@@ -192,13 +194,13 @@ if(cmd.isTraining()){
             csvWriter.append(c2v[j]+"");
             csvWriter.append(",");
         }
-        csvWriter.write(mp.isDecision()+"");
-        csvWriter.append("\n ");
+        csvWriter.append(mp.isDecision()+"");
+
     }
     csvWriter.flush();
     csvWriter.close();
 }else{
-    FileWriter csvWriter = new FileWriter("/Users/sidekoiii/Documents/SP2019-DoNotCopy/MerryEngine/mertics.csv");
+    FileWriter csvWriter = new FileWriter("/home/sp2019-07/SP2019-DoNotCopy/MerryEngine/mertics.csv");
     csvWriter.append("DiffLOC");
     csvWriter.append(",");
     csvWriter.append("DiffIdentifierNo");
@@ -226,9 +228,9 @@ if(cmd.isTraining()){
         csvWriter.append(",");
     }
     csvWriter.append("c2v_11");
-    csvWriter.append("\n");
     for (int i = 0; i<methodPairList.size();i++){
         MethodPair mp = methodPairList.get(i);
+        csvWriter.append("\n ");
         csvWriter.append(mp.getDiffLOC()+"");
         csvWriter.append(",");
         csvWriter.append(mp.getDiffIdentifierNo()+"");
@@ -256,8 +258,7 @@ if(cmd.isTraining()){
             csvWriter.append(c2v[j]+"");
             csvWriter.append(",");
         }
-        csvWriter.write(c2v[11]+"");
-        csvWriter.append("\n ");
+        csvWriter.append(c2v[11]+"");
     }
     csvWriter.flush();
     csvWriter.close();

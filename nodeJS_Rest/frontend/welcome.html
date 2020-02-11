@@ -1,21 +1,18 @@
 <html lang="en">
 
 <head>
-	<style>
-	a {
-	font-size: 50;
-	padding-top: 50px;
-	padding-left: 25px;
-}
-
-	</style>
-	<meta charset="UTF-8">
+	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-
-	<title>Hello</title>
+		 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+		 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+		 <link href="styles.css" rel="stylesheet" />
 
 </head>
 
@@ -27,20 +24,21 @@
 								<img src="/images/logo.png" alt="Merry's logo" style="width:70px;height:70px;">
 							</a>
 					</li>
-				</ul>
-			</div>
- <ul class="nav justify-content-end" id="menu" style="padding-left:87%">
-	 	<li class="nav-item"id="ProPic" style="padding-right:">
+				<li class="nav-item" style="padding-top:15%">
+						<a class="nav-link" href="/Result.html">Result</a>
+				</li>
+			</ul>
+ <ul class="nav justify-content-end" id="menu" style="padding-left:83%">
+	 	<li class="nav-item"id="ProPic">
 
 		</li>
 					<li class="nav-item">
-							<b class="nav-link" id="logout-button" onclick="logoutFunc()" style="padding-top:30%">Logout</b>
+							<b class="nav-link" id="logout-button" onclick="logoutFunc()" style="padding-top:35%">Logout</b>
 					</li>
 				</ul>
-	</div>
 </nav>
 
-<a id="Repos"> Repositories of </a>
+<a id="Repos" style="font-size: 50;padding-top: 50px;padding-left: 25px;"> Repositories of </a>
 <table id="showRepos" class="table table-bordered" style="width:98%" align="center">
 	<thead>
 <tr>
@@ -52,36 +50,41 @@
 </thead>
 </table>
 
- <br>
-
- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-
  <!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalCenter">
   Launch demo modal
 </button>
 
-<!-- Modal -->
-<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+<div class="modal fade" id="ModalCenter" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
+    <div class="modal-content" width='300%' height='300%'>
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalCenterTitle">Modal title</h5>
+        <h3 class="modal-title" id="ModalCenterTitle">Processing please wait...</h3>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <p>Modal body text goes here.</p>
+
+				<div class="d-flex align-items-center">
+					 <strong style="font-size:16px" >Cloning from GitHub</strong>
+					 <div style="padding-right:30%">
+	<div class="circle-loader">
+	  <div class="checkmark draw"></div>
+	</div>
+</div>
+</div>
+	<div class="d-flex align-items-center" style="padding-top:3%">
+		<strong style="font-size:16px">Analyzing Clone</strong>
+<div class="circle-loader" >
+  <div class="checkmark draw"></div>
+</div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
+
+			<p><button id="toggle" type="button" class="btn btn-success">Toggle Completed</button></p>
     </div>
   </div>
+</div>
 </div>
 
 </body>
@@ -90,6 +93,11 @@
 	// param, available in the browsers "location" global
 	const query = window.location.search.substring(1)
 	const token = query.split('access_token=')[1]
+
+	$('#toggle').click(function() {
+	  $('.circle-loader').toggleClass('load-complete');
+	  $('.checkmark').toggle();
+	});
 
 
 	fetch('https://api.github.com/user',{
@@ -141,6 +149,8 @@
 				const ActionButton = document.createElement('button')
 				ActionButton.innerHTML = "Click to Analyze"
 				ActionButton.setAttribute("id","AnalyzeButton"+[i])
+				ActionButton.setAttribute("data-toggle" , "modal")
+				ActionButton.setAttribute("data-target", "#ModalCenter")
 				ActionButton.setAttribute("onclick","clone('"+url+"')")
 
 				const ResultButton = document.createElement('button')
@@ -191,7 +201,11 @@
 		fetch('http://localhost:8001/api/clone', payload).then(async (res) => {
 			const data = await res.json();
 			console.log(data);
-		});
+		}).then(res=> {
+			if(res.status == '200'){
+				console.log('status:ok');
+			}
+		})
 	}
 	function logoutFunc(){
 		fetch('http://localhost:8001/api/logout', { method:"GET" }).then( async (res)=>{
@@ -200,5 +214,4 @@
 	}
 
 </script>
-
 </html>

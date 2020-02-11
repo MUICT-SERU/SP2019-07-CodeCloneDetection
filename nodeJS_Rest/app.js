@@ -8,13 +8,15 @@ const exec = require('child_process').exec;
 const execSync = require('child_process').execSync;
 
 const config = require('./config/config.js')
-
+const fs = require('fs');
 const app = express()
 
 app.use(bodyParser.json({ type: 'application/json' }))
 
 const clientID = `${global.gConfig.clientID}`;
 const clientSecret = `${global.gConfig.clientSecret}`;
+
+const lineReader = require('line-reader');
 
 // Declare the redirect route
 app.get('/oauth/redirect', (req, res) => {
@@ -43,35 +45,45 @@ app.get('/oauth/redirect', (req, res) => {
 
 app.use(express.static(__dirname + '/frontend'))
 
-
 app.post('/api/clone', function(req, res) {
-  // console.log(req.params.url)
-  // console.log(req.body.github)
   res.json(req.body)
 
-  // var CloneRepos = exec('git clone '+`${req.body.github}`+' ./temp');
-  // var ExecTool = exec('java -jar simian-2.5.10.jar ./temp/*.java') ;
   execSync('git clone '+`${req.body.github} ./temp`, (error, stdout, stderr) => {
     if (error) {
         console.error(`exec error: ${error}`);
         return;
       }
       console.log(`stdout: ${stdout}`);
-      console.error(`stderr: ${stderr}`);
+      // console.error(`stderr: ${stderr}`);
+
+      // <script>document.getElementById('toggle').click();</script>
     })
-    exec('java -jar simian-2.5.10.jar ./temp/*.java ', (error, stdout, stderr) => {
+    exec('java -jar simian-2.5.10.jar -reportDuplicateText ./temp/*.java > .\\output.txt | type .\\output.txt', (error, stdout, stderr) => {
       if (error) {
           console.error(`exec error: ${error}`);
-          return;
         }
         console.log(`stdout: ${stdout}`);
-        console.error(`stderr: ${stderr}`);
-      });
+        // console.error(`stderr: ${stderr}`);
+      })
+      return res.status();
 })
-// app.get('/api/logout', function(req, res){
+// app.delete('/api/logout', function(req, res){
 //   res.redirect('/');
 // });
+app.get('/api/readFile',function(req,res, next){
+  // lineReader.eachLine('./output.txt', function(line ,last) {
+  //         let obj = {};
+  //         for (let i = 0; i<line.length; i++) {
+  //             obj = { [i] : line};
+  //         }
+  //         console.log(obj);
+  fs.readFile('./output.txt','utf8', (err, data)=>{
+    let obj = { output: data};
+    // console.log(obj);
+    res.json(obj);
+  });
 
+})
 //localhost 8001
 app.listen(global.gConfig.node_port,() => {
   console.log(`${global.gConfig.app_name} listening on port ${global.gConfig.node_port}`);
