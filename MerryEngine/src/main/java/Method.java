@@ -29,6 +29,7 @@ public class Method {
     private String returnType;
     private double[] code2vecVector ;
     private boolean vectorSet;
+    private String c2vVectorAsString;
 
 
     public Method(int start, int end, String path,String fileName, String code, String name,String type) throws Exception {
@@ -43,8 +44,6 @@ public class Method {
         this.vectorSet = false;
         this.id = fileName+start+end;
         gatherMetrics();
-//        setZeroCode2VecVector(384);
-//        System.out.println("code2vec Vector : \n"+this.code2vecVector);
     }
 
     private void gatherMetrics() throws Exception {
@@ -147,6 +146,10 @@ public class Method {
         return vector;
     }
 
+    public String getId() {
+        return id;
+    }
+
     public int getStartLine() {
         return startLine;
     }
@@ -207,21 +210,25 @@ public class Method {
         return returnType;
     }
 
-    public void setCode2vecVector(String vector,int size) {
+    public void setC2vVectorAsString(String c2vVectorAsString) {
+        this.c2vVectorAsString = c2vVectorAsString;
+    }
+
+    public String getC2vVectorAsString() {
+        return c2vVectorAsString;
+    }
+
+    public void setCode2vecVector(String vector, int size) {
+//        double[] c2vVector = new double[size];
         code2vecVector = new double[size];
-        String[] vec = vector.split(" ");
+        String[] vec = vector.split("\\s+");
+//        System.out.println(vec.length);
         for(int i=0 ;i<vec.length;i++){
             code2vecVector[i] = Double.parseDouble(vec[i]);
         }
         vectorSet = true;
+//        this.code2vecVector = c2vVector;
     }
-    private void setZeroCode2VecVector(int size){
-        code2vecVector = new double[size];
-        for(int i = 0 ; i < size; i++){
-            code2vecVector[i] = 0.0000000;
-        }
-    }
-
     public double[] getCode2vecVector() {
         return code2vecVector;
     }

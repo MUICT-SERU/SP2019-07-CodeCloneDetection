@@ -15,24 +15,27 @@ public class MerryEngine {
         System.out.println("testing mode : "+cmd.isTraining());
         boolean useSizeFilter = cmd.isSizeFilter();
         final File folder = new File(cmd.getInputSource());
-        List<String> fileList = new ArrayList<String>();
+        ArrayList<String> fileList = new ArrayList<String>();
         search(".*\\.java", folder, fileList);
-        List<Method> methodList = new ArrayList<Method>();
+        List<Method> methodList = new ArrayList<>();
         HashMap<String,Method> methodHashMap = new HashMap<>();
         System.out.println("Java files : "+fileList.size());
         for (String f : fileList) {
 //            methodList.addAll(new JavaMethodParser(f).parseMethod());
             methodHashMap.putAll(new JavaMethodParser(f).parseMethod());
         }
+        System.out.println("Done creating Hashmap");
 //        int id=1;
-        for (Map.Entry<String, Method> entry : methodHashMap.entrySet()) {
-            Method m = entry.getValue();
-//            m.setId(id);
-//            id++;
-//            methodList.add(m);
-            m.writeFile();
-        }
-        System.out.println("Done Write files");
+        //write each method to .java file for code2vec in folder
+//        System.out.println("Start writing files");
+//        for (Map.Entry<String, Method> entry : methodHashMap.entrySet()) {
+//            Method m = entry.getValue();
+////            m.setId(id);
+////            id++;
+////            methodList.add(m);
+//            m.writeFile();
+//        }
+//        System.out.println("Done Write files");
 //        boolean readVector = false;
 //        String s = null;
 //        try {
@@ -69,48 +72,99 @@ public class MerryEngine {
 //            e.printStackTrace();
 //            System.exit(-1);
 //        }
+//        System.out.println("Done get vector from code2vec");
+        if(cmd.isTraining()){
+            HashMap<String,Method> selectedMethodHashMap = new HashMap<>();
+            BufferedReader csvFilterTrueReader = new BufferedReader(new FileReader("SelectedClones.csv"));
+            String line;
+            while ((line = csvFilterTrueReader.readLine()) != null) {
+                String[] data = line.split(",");
+                Method m = methodHashMap.get(data[0].replace(".java","")+data[1]+data[2]);
+                if(m!=null){
+                    selectedMethodHashMap.put(data[0].replace(".java","")+data[1]+data[2],m);
+                }
+                m = methodHashMap.get(data[4].replace(".java","")+data[5]+data[6]);
+                if(m!=null){
+                    selectedMethodHashMap.put(data[4].replace(".java","")+data[5]+data[6],m);
+                }
+            }
+            csvFilterTrueReader.close();
+            BufferedReader csvFilterFalseReader = new BufferedReader(new FileReader("SelectedFalseClones.csv"));
+            while ((line = csvFilterFalseReader.readLine()) != null) {
+                String[] data = line.split(",");
+                Method m = methodHashMap.get(data[0].replace(".java","")+data[1]+data[2]);
+                if(m!=null){
+                    selectedMethodHashMap.put(data[0].replace(".java","")+data[1]+data[2],m);
+                }
+                m = methodHashMap.get(data[4].replace(".java","")+data[5]+data[6]);
+                if(m!=null){
+                    selectedMethodHashMap.put(data[4].replace(".java","")+data[5]+data[6],m);
+                }
+            }
+            csvFilterFalseReader.close();
+            methodHashMap.clear();
+            methodHashMap.putAll(selectedMethodHashMap);
+            selectedMethodHashMap.clear();
+        }
 
-        BufferedReader csvReader = new BufferedReader(new FileReader("/home/sp2019-07/SP2019-DoNotCopy/MerryEngine/c2vVector.csv"));
+        int ch =0;
+        BufferedReader csvReader = new BufferedReader(new FileReader("c2vVector.csv"));
         String row;
         while ((row = csvReader.readLine()) != null) {
+            ch++;
+            if(ch %100 == 0){
+                System.out.println("estimate current line : "+ch);
+            }
             String[] data = row.split(",");
-//            Method methodToAssign = methodList.get(Integer.parseInt(data[0])-1);
-            Method methodToAssign = methodHashMap.get(data[0]);
-            methodToAssign.setCode2vecVector(data[1],cmd.getCode2vecSize());
+            String key = data[0].replace(".java","");
+            Method methodToAssign = methodHashMap.get(key);
+////            System.out.println(key+" --> key");
+            if(methodToAssign!= null){
+                methodToAssign.setCode2vecVector(data[1].trim(),cmd.getCode2vecSize());
+            }
+//            methodToAssign.setC2vVectorAsString(data[1].trim());
         }
         csvReader.close();
-        List<Method> removeList = new ArrayList<>();
-        for(Map.Entry<String, Method> entry : methodHashMap.entrySet()){
-            Method rm = entry.getValue();
-            if(rm.isVectorSet()==false){
-                methodHashMap.remove(rm);
-            }
-        }
         System.out.println("Method hash size : " + methodHashMap.size());
       //method paring
-        List<MethodPair> methodPairList = new ArrayList<MethodPair>();
+        List<MethodPair> methodPairList = new ArrayList<>();
+        int vecSize = cmd.getCode2vecSize();
         if(cmd.isTraining()){
-            BufferedReader csvTrainingTrueReader = new BufferedReader(new FileReader("/home/sp2019-07/SelectedClones.csv"));
+            BufferedReader csvTrainingTrueReader = new BufferedReader(new FileReader("SelectedClones.csv"));
             String pair;
             while ((pair = csvTrainingTrueReader.readLine()) != null) {
                 String[] data = pair.split(",");
                 Method m1 = methodHashMap.get(data[0]+data[1]+data[2]);
-                System.out.println("Method 1 : "+ m1.toString());
+                if(!m1.isVectorSet()){
+                    m1.setCode2vecVector(m1.getC2vVectorAsString(),vecSize);
+                }
+//                System.out.println("Method 1 : "+ m1.toString());
                 Method m2 = methodHashMap.get(data[4]+data[5]+data[6]);
-                System.out.println("Method 2 : "+ m2.toString());
-                if(m1!=null&&m2!=null){
+                if(!m2.isVectorSet()){
+                    m2.setCode2vecVector(m2.getC2vVectorAsString(),vecSize);
+                }
+//                System.out.println("Method 2 : "+ m2.toString());
+                if(m1.isVectorSet()&&m2.isVectorSet()){
                     methodPairList.add(new MethodPair(m1,m2,true));
                 }
             }
-            BufferedReader csvTrainingFalseReader = new BufferedReader(new FileReader("/home/sp2019-07/SelectedFalseClones.csv"));
-            while ((pair = csvTrainingTrueReader.readLine()) != null) {
+            csvTrainingTrueReader.close();
+            BufferedReader csvTrainingFalseReader = new BufferedReader(new FileReader("SelectedFalseClones.csv"));
+            while ((pair = csvTrainingFalseReader.readLine()) != null) {
                 String[] data = pair.split(",");
-                Method m1 = methodHashMap.get(new MultiKey(data[0],Integer.parseInt(data[1]),Integer.parseInt(data[2])));
-                Method m2 = methodHashMap.get(new MultiKey(data[4],Integer.parseInt(data[5]),Integer.parseInt(data[6])));
-                if(m1!=null&&m2!=null){
+                Method m1 = methodHashMap.get(data[0]+data[1]+data[2]);
+                if(!m1.isVectorSet()){
+                    m1.setCode2vecVector(m1.getC2vVectorAsString(),vecSize);
+                }
+                Method m2 = methodHashMap.get(data[4]+data[5]+data[6]);
+                if(!m2.isVectorSet()){
+                    m2.setCode2vecVector(m2.getC2vVectorAsString(),vecSize);
+                }
+                if(m1.isVectorSet()&&m2.isVectorSet()){
                     methodPairList.add(new MethodPair(m1,m2,false));
                 }
             }
+            csvTrainingFalseReader.close();
         }else {
             for (Map.Entry<String, Method> entry : methodHashMap.entrySet()) {
                 methodList.add(entry.getValue());
@@ -119,7 +173,7 @@ public class MerryEngine {
                 for(int j=i+1 ; j< methodList.size();j++){
                     //size filter
                     //with turn on and off control
-                    if (useSizeFilter == true) {
+                    if (useSizeFilter) {
                         int m1Tokens = methodList.get(i).getTokenNo();
                         int m2Tokens = methodList.get(j).getTokenNo();
                         double T = cmd.getSizeFilterThreshold();
@@ -136,7 +190,7 @@ public class MerryEngine {
             }
         }
 if(cmd.isTraining()){
-    FileWriter csvWriter = new FileWriter("/home/sp2019-07/SP2019-DoNotCopy/MerryEngine/mertics.csv");
+    FileWriter csvWriter = new FileWriter("trainModelMetrics.csv");
     csvWriter.append("DiffLOC");
     csvWriter.append(",");
     csvWriter.append("DiffIdentifierNo");
@@ -200,7 +254,7 @@ if(cmd.isTraining()){
     csvWriter.flush();
     csvWriter.close();
 }else{
-    FileWriter csvWriter = new FileWriter("/home/sp2019-07/SP2019-DoNotCopy/MerryEngine/mertics.csv");
+    FileWriter csvWriter = new FileWriter("metrics.csv");
     csvWriter.append("DiffLOC");
     csvWriter.append(",");
     csvWriter.append("DiffIdentifierNo");
