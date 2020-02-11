@@ -112,9 +112,9 @@ public class MerryEngine {
         String row;
         while ((row = csvReader.readLine()) != null) {
             ch++;
-            if(ch %100 == 0){
-                System.out.println("estimate current line : "+ch);
-            }
+//            if(ch %100 == 0){
+//                System.out.println("estimate current line : "+ch);
+//            }
             String[] data = row.split(",");
             String key = data[0].replace(".java","");
             Method methodToAssign = methodHashMap.get(key);
@@ -134,34 +134,38 @@ public class MerryEngine {
             String pair;
             while ((pair = csvTrainingTrueReader.readLine()) != null) {
                 String[] data = pair.split(",");
-                Method m1 = methodHashMap.get(data[0]+data[1]+data[2]);
-                if(!m1.isVectorSet()){
-                    m1.setCode2vecVector(m1.getC2vVectorAsString(),vecSize);
-                }
+                Method m1 = methodHashMap.get(data[0].replace(".java","")+data[1]+data[2]);
+//                if(!m1.isVectorSet()){
+//                    m1.setCode2vecVector(m1.getC2vVectorAsString(),vecSize);
+//                }
 //                System.out.println("Method 1 : "+ m1.toString());
-                Method m2 = methodHashMap.get(data[4]+data[5]+data[6]);
-                if(!m2.isVectorSet()){
-                    m2.setCode2vecVector(m2.getC2vVectorAsString(),vecSize);
+                Method m2 = methodHashMap.get(data[4].replace(".java","")+data[5]+data[6]);
+//                if(!m2.isVectorSet()){
+//                    m2.setCode2vecVector(m2.getC2vVectorAsString(),vecSize);
+//                }
+                if(m1!=null&&m2!=null){
+                    if(m1.isVectorSet()&&m2.isVectorSet()){
+                        methodPairList.add(new MethodPair(m1,m2,true));
+                    }
                 }
-//                System.out.println("Method 2 : "+ m2.toString());
-                if(m1.isVectorSet()&&m2.isVectorSet()){
-                    methodPairList.add(new MethodPair(m1,m2,true));
-                }
+
             }
             csvTrainingTrueReader.close();
             BufferedReader csvTrainingFalseReader = new BufferedReader(new FileReader("SelectedFalseClones.csv"));
             while ((pair = csvTrainingFalseReader.readLine()) != null) {
                 String[] data = pair.split(",");
-                Method m1 = methodHashMap.get(data[0]+data[1]+data[2]);
-                if(!m1.isVectorSet()){
-                    m1.setCode2vecVector(m1.getC2vVectorAsString(),vecSize);
-                }
-                Method m2 = methodHashMap.get(data[4]+data[5]+data[6]);
-                if(!m2.isVectorSet()){
-                    m2.setCode2vecVector(m2.getC2vVectorAsString(),vecSize);
-                }
-                if(m1.isVectorSet()&&m2.isVectorSet()){
-                    methodPairList.add(new MethodPair(m1,m2,false));
+                Method m1 = methodHashMap.get(data[0].replace(".java","")+data[1]+data[2]);
+//                if(!m1.isVectorSet()){
+//                    m1.setCode2vecVector(m1.getC2vVectorAsString(),vecSize);
+//                }
+                Method m2 = methodHashMap.get(data[4].replace(".java","")+data[5]+data[6]);
+//                if(!m2.isVectorSet()){
+//                    m2.setCode2vecVector(m2.getC2vVectorAsString(),vecSize);
+//                }
+                if(m1!=null&&m2!=null){
+                    if(m1.isVectorSet()&&m2.isVectorSet()){
+                        methodPairList.add(new MethodPair(m1,m2,false));
+                    }
                 }
             }
             csvTrainingFalseReader.close();
