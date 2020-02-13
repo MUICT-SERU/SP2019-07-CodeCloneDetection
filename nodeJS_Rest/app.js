@@ -6,7 +6,7 @@ var bodyParser = require('body-parser')
 
 const exec = require('child_process').exec;
 const execSync = require('child_process').execSync;
-
+const moment = require('moment');
 const config = require('./config/config.js')
 const fs = require('fs');
 const app = express()
@@ -46,7 +46,6 @@ app.get('/oauth/redirect', (req, res) => {
 app.use(express.static(__dirname + '/frontend'))
 
 app.post('/api/clone', function(req, res) {
-  res.json(req.body)
 
   execSync('git clone '+`${req.body.github} ./temp`, (error, stdout, stderr) => {
     if (error) {
@@ -75,11 +74,12 @@ app.post('/api/clone', function(req, res) {
           // console.log(objCheck);
         })
         var user = `${req.body.user}`;
+        var repoName = `${req.body.reposName}`;
+        let time = moment().format('MMMM Do YYYY, h:mm:ss');
         let data = fs.readFileSync('./output.txt','utf8');
-
-        let obj = {owner: user, result: data};
+        let obj = {owner: user, repoName: repoName, result: data, date: time};
         console.log(obj);
-
+        res.json(obj);
 })
 // app.delete('/api/logout', function(req, res){
 //   res.redirect('/');
@@ -92,7 +92,6 @@ app.post('/api/readFile',function(req,res, next){
 //   //             obj = { [i] : line};
 //   //         }
 //   //         console.log(obj);
-  res.json(req.body)
 var userName = `${req.body.user}`;
     fs.readFile('./output.txt','utf8', (err, data)=>{
        if (err) throw err;
