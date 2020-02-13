@@ -2,6 +2,8 @@ import weka.classifiers.Classifier;
 import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.evaluation.Evaluation;
 
+import weka.classifiers.trees.REPTree;
+import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.CSVSaver;
 import weka.core.converters.ConverterUtils;
@@ -24,20 +26,31 @@ public class WekaTraining {
         data.setClassIndex(data.numAttributes()-1);
 
         //Split data to 80% of train and 20% of test datasets
-        data.randomize(new java.util.Random(0));
-        int trainSize = (int) Math.round(data.numInstances() * 0.8);
-        int testSize = data.numInstances() - trainSize;
+        data.randomize(new java.util.Random(1));
+        int trainSize = (int) Math.round(data.numInstances() * 0.7);
+        int validSize = (int) Math.round(data.numInstances() * 0.1);
+        int testSize = data.numInstances() - (trainSize + validSize);
         Instances train = new Instances(data, 0, trainSize);
-        Instances test = new Instances(data, trainSize, testSize);
+        Instances valid = new Instances(data, trainSize,validSize);
+        Instances test = new Instances(data, trainSize+validSize, testSize);
+
 
 
         //save split instances to csv
         saveCsv(train,"trainDataSet.csv");
+        saveCsv(valid,"validDataSet.csv");
         saveCsv(test,"testDataSet.csv");
 
 
+        //set classifier option
+        int treeDepth = 3;
+        String[] options = new String[2];
+        options[0] = "-L"; options[1] = String.valueOf(treeDepth);
+
         //Build the classifier
-        J48 tree = new J48();
+       // J48 tree = new J48();
+        REPTree tree = new REPTree();
+        tree.setOptions(options);
         tree.buildClassifier(train);
 
         //create model evaluation
@@ -47,30 +60,63 @@ public class WekaTraining {
 //        Instances testData = testSource.getDataSet();
 //        testData.setClassIndex(testData.numAttributes()-1);
 
-        //evaluate model
-        eval.evaluateModel(tree,test);
+        //validate model
+        eval.evaluateModel(tree,valid);
 
-        System.out.println("Evaluation Result :");
+        System.out.println("Evaluation Result on Validate Data set:");
         System.out.println("Correct % : "+ eval.pctCorrect());
         System.out.println("Incorrect % : "+eval.pctIncorrect());
+        System.out.println("______________________________________");
         System.out.println("precision : "+eval.precision(1));
         System.out.println("recall : "+eval.recall(1));
         System.out.println("f1 : "+eval.fMeasure(1));
         System.out.println("precision : "+eval.precision(0));
         System.out.println("recall : "+eval.recall(0));
         System.out.println("f1 : "+eval.fMeasure(0));
+        System.out.println("______________________________________");
+        System.out.println("Weight REPORT :");
+        System.out.println("Tree Depth : "+ options[1]);
         System.out.println("precision : "+eval.weightedPrecision());
         System.out.println("recall : "+eval.weightedRecall());
         System.out.println("f1 : "+eval.weightedFMeasure());
+        System.out.println("TP : "+eval.weightedTruePositiveRate());
+        System.out.println("TN : "+eval.weightedTrueNegativeRate());
+        System.out.println("FP : "+eval.weightedFalsePositiveRate());
+        System.out.println("FN : "+eval.weightedFalseNegativeRate());
+
+        //evaluate model
+//        eval.evaluateModel(tree,test);
+//        System.out.println("\n////////////////////////////////////\n");
+//        System.out.println("Evaluation Result on Test Data set:");
+//        System.out.println("Correct % : "+ eval.pctCorrect());
+//        System.out.println("Incorrect % : "+eval.pctIncorrect());
+//        System.out.println("______________________________________");
+//        System.out.println("precision : "+eval.precision(1));
+//        System.out.println("recall : "+eval.recall(1));
+//        System.out.println("f1 : "+eval.fMeasure(1));
+//        System.out.println("precision : "+eval.precision(0));
+//        System.out.println("recall : "+eval.recall(0));
+//        System.out.println("f1 : "+eval.fMeasure(0));
+//        System.out.println("______________________________________");
+//        System.out.println("Weight REPORT :");
+//        System.out.println("Tree Depth : "+ treeDepth);
+//        System.out.println("precision : "+eval.weightedPrecision());
+//        System.out.println("recall : "+eval.weightedRecall());
+//        System.out.println("f1 : "+eval.weightedFMeasure());
+//        System.out.println("TP : "+eval.weightedTruePositiveRate());
+//        System.out.println("TN : "+eval.weightedTrueNegativeRate());
+//        System.out.println("FP : "+eval.weightedFalsePositiveRate());
+//        System.out.println("FN : "+eval.weightedFalseNegativeRate());
+
 
 
         // display classifier
         final javax.swing.JFrame jf =
                 new javax.swing.JFrame("Weka Classifier Tree Visualizer: J48");
-        jf.setSize(1000,1000);
+        jf.setSize(1500,800);
         jf.getContentPane().setLayout(new BorderLayout());
         TreeVisualizer tv = new TreeVisualizer(null,
-                ((J48) tree).graph(),
+                (tree).graph(),
                 new PlaceNode2());
         jf.getContentPane().add(tv, BorderLayout.CENTER);
         jf.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -89,4 +135,5 @@ public class WekaTraining {
         saver.setFile(new File(path));
         saver.writeBatch();
     }
+
 }
