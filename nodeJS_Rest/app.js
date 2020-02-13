@@ -58,31 +58,48 @@ app.post('/api/clone', function(req, res) {
 
       // <script>document.getElementById('toggle').click();</script>
     })
-    exec('java -jar simian-2.5.10.jar -reportDuplicateText ./temp/*.java > .\\output.txt | type .\\output.txt', (error, stdout, stderr) => {
+    execSync('java -jar simian-2.5.10.jar -reportDuplicateText ./temp/*.java > .\\output.txt | type .\\output.txt', (error, stdout, stderr) => {
       if (error) {
           console.error(`exec error: ${error}`);
         }
         console.log(`stdout: ${stdout}`);
         // console.error(`stderr: ${stderr}`);
+        // console.log(objCheck);
       })
-      return res.status();
+      execSync('rmdir /s /q .\\temp', (error, stdout, stderr) => {
+        if (error) {
+            console.error(`exec error: ${error}`);
+          }
+          console.log('successfully remove temp folder');
+          // console.error(`stderr: ${stderr}`);
+          // console.log(objCheck);
+        })
+        var user = `${req.body.user}`;
+        let data = fs.readFileSync('./output.txt','utf8');
+
+        let obj = {owner: user, result: data};
+        console.log(obj);
+
 })
 // app.delete('/api/logout', function(req, res){
 //   res.redirect('/');
 // });
-app.get('/api/readFile',function(req,res, next){
-  // lineReader.eachLine('./output.txt', function(line ,last) {
-  //         let obj = {};
-  //         for (let i = 0; i<line.length; i++) {
-  //             obj = { [i] : line};
-  //         }
-  //         console.log(obj);
-  fs.readFile('./output.txt','utf8', (err, data)=>{
-    let obj = { output: data};
-    // console.log(obj);
-    res.json(obj);
-  });
 
+app.post('/api/readFile',function(req,res, next){
+//   // lineReader.eachLine('./output.txt', function(line ,last) {
+//   //         let obj = {};
+//   //         for (let i = 0; i<line.length; i++) {
+//   //             obj = { [i] : line};
+//   //         }
+//   //         console.log(obj);
+  res.json(req.body)
+var userName = `${req.body.user}`;
+    fs.readFile('./output.txt','utf8', (err, data)=>{
+       if (err) throw err;
+      let obj = { owner: userName, result : data};
+      console.log(userName);
+      res.json(obj);
+    });
 })
 //localhost 8001
 app.listen(global.gConfig.node_port,() => {

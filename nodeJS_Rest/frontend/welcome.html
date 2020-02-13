@@ -86,7 +86,8 @@
   </div>
 </div>
 </div>
-
+<button type="button" name="button" onclick="dataoutput()">test</button>
+<div id="TextOutput" style="padding-left:7%;font:20px"></div>
 </body>
 <script>
 	// We can get the token from the "access_token" query
@@ -108,7 +109,8 @@
 		// Parse the response as JSON
 		.then(res => res.json())
 		.then(res =>{
-			const NameOwner = document.createTextNode(`${res.login}`)
+			window.dataName = `${res.login}`;
+			const NameOwner = document.createTextNode(dataName)
 			document.getElementById("Repos").appendChild(NameOwner)
 			const ProfilePicture = document.createElement("img")
 			ProfilePicture.setAttribute("style","width:70px;height:70px;")
@@ -181,37 +183,68 @@
 	})
 	function clone(url) {
 
-		const data = {github: url};
 
-		const headers = {
-			'Accept': 'application/json',
-			'Content-Type': 'application/json'
-		};
 
-		const method = 'POST';
+		// const headers = {
+		// 	'Accept': 'application/json',
+		// 	'Content-Type': 'application/json'
+		// };
+		//
+		// const method = 'POST';
+		//
+		// const body = JSON.stringify(data);
+		//
+		// const payload = {
+		// 	method,
+		// 	headers,
+		// 	body,
+		// };
 
-		const body = JSON.stringify(data);
+		// fetch('http://localhost:8001/api/clone', payload).then(async (res) => {
+		// 	const data = await res.json();
+		// 	console.log(data);
+		// })
 
-		const payload = {
-			method,
-			headers,
-			body,
-		};
+    $.ajax({
+        url: 'http://localhost:8001/api/clone',
+        contentType: "application/json",
+				type: "POST",
+				data: JSON.stringify({github: url, user : dataName}),
+        dataType: 'json',
+        success: function(result){
+            console.log(result);
+        }
+    })
 
-		fetch('http://localhost:8001/api/clone', payload).then(async (res) => {
-			const data = await res.json();
-			console.log(data);
-		}).then(res=> {
-			if(res.status == '200'){
-				console.log('status:ok');
-			}
-		})
 	}
 	function logoutFunc(){
 		fetch('http://localhost:8001/api/logout', { method:"GET" }).then( async (res)=>{
 			alert("You have logout!");
 		});
 	}
+
+// 	fetch('http://localhost:8001/api/readFile')
+//
+// .then(res => res.json())
+// .then(res=>{
+// 	var json = `${res.result}`;
+// // 	var originalMsg = JSON.stringify(json);
+// // 	console.log(json)
+// // console.log(originalMsg)
+// // var updatedMsg = originalMsg.replace(/\r\n/g, "<br>");
+// // console.log(updatedMsg)
+// // var newObj = JSON.parse(updatedMsg);
+// // console.log(newObj);
+// 	var jsonArray = json.split("\r\n");
+// 	var objResult = JSON.stringify(json);
+// 	for(i=0; i < jsonArray.length; i++){
+// 	const result = document.createTextNode(jsonArray[i]);
+// 	const div = document.getElementById('TextOutput');
+// 		const br = document.createElement('br');
+// 	div.appendChild(result);
+// 	div.appendChild(br);
+// }
+// })
 
 </script>
 </html>
