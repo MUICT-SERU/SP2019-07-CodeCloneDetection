@@ -78,28 +78,45 @@ app.post('/api/clone', function(req, res) {
         let time = moment().format('MMMM Do YYYY, h:mm:ss');
         let data = fs.readFileSync('./output.txt','utf8');
         let obj = {owner: user, repoName: repoName, result: data, date: time};
-        console.log(obj);
+        res.json(obj);
+})
+
+app.post('/api/guestclone', function(req, res) {
+
+  execSync('git clone '+`${req.body.github} ./temp`, (error, stdout, stderr) => {
+    if (error) {
+        console.error(`exec error: ${error}`);
+        return;
+      }
+      console.log(`stdout: ${stdout}`);
+      // console.error(`stderr: ${stderr}`);
+
+      // <script>document.getElementById('toggle').click();</script>
+    })
+    execSync('java -jar simian-2.5.10.jar -reportDuplicateText ./temp/*.java > .\\output.txt | type .\\output.txt', (error, stdout, stderr) => {
+      if (error) {
+          console.error(`exec error: ${error}`);
+        }
+        console.log(`stdout: ${stdout}`);
+        // console.error(`stderr: ${stderr}`);
+        // console.log(objCheck);
+      })
+      execSync('rmdir /s /q .\\temp', (error, stdout, stderr) => {
+        if (error) {
+            console.error(`exec error: ${error}`);
+          }
+          console.log('successfully remove temp folder');
+          // console.error(`stderr: ${stderr}`);
+          // console.log(objCheck);
+        })
+        let data = fs.readFileSync('./output.txt','utf8');
+        let obj = {result: data};
         res.json(obj);
 })
 // app.delete('/api/logout', function(req, res){
 //   res.redirect('/');
 // });
 
-app.post('/api/readFile',function(req,res, next){
-//   // lineReader.eachLine('./output.txt', function(line ,last) {
-//   //         let obj = {};
-//   //         for (let i = 0; i<line.length; i++) {
-//   //             obj = { [i] : line};
-//   //         }
-//   //         console.log(obj);
-var userName = `${req.body.user}`;
-    fs.readFile('./output.txt','utf8', (err, data)=>{
-       if (err) throw err;
-      let obj = { owner: userName, result : data};
-      console.log(userName);
-      res.json(obj);
-    });
-})
 //localhost 8001
 app.listen(global.gConfig.node_port,() => {
   console.log(`${global.gConfig.app_name} listening on port ${global.gConfig.node_port}`);
