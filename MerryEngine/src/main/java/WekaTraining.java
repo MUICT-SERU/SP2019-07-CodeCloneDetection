@@ -53,8 +53,10 @@ public class WekaTraining {
         tree.setOptions(options);
         tree.buildClassifier(train);
 
+        //saving model
+        weka.core.SerializationHelper.write("tree"+treeDepth+"_model.model",tree);
         //create model evaluation
-        Evaluation eval = new Evaluation(train);
+         Evaluation eval = new Evaluation(train);
         //load test data set
 //        ConverterUtils.DataSource testSource = new ConverterUtils.DataSource("/Users/sidekoiii/Documents/GitHub/SP2019-DoNotCopy/MerryEngine/metricsForTest.csv");
 //        Instances testData = testSource.getDataSet();
@@ -62,6 +64,7 @@ public class WekaTraining {
 
         //validate model
         eval.evaluateModel(tree,valid);
+
 
         System.out.println("Evaluation Result on Validate Data set:");
         System.out.println("Correct % : "+ eval.pctCorrect());
@@ -108,7 +111,10 @@ public class WekaTraining {
         System.out.println("FP : "+eval.weightedFalsePositiveRate());
         System.out.println("FN : "+eval.weightedFalseNegativeRate());
 
-
+//        double label = tree.classifyInstance(test.instance(0);
+//        test.instance(0).setClassValue(label);
+//
+//        System.out.println(test.instance(0).stringValue(23));
 
         // display classifier
         final javax.swing.JFrame jf =
