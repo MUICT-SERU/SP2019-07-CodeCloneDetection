@@ -21,14 +21,16 @@ public class MethodPair {
     private boolean decision = Boolean.parseBoolean(null);
     private int id;
 
-    public MethodPair(Method m1,Method m2){
+    public MethodPair(int id,Method m1,Method m2){
+        this.id = id;
         this.method1 = m1;
         this.method2 = m2;
         computeMetrics();
         computeCode2VecSimilarity();
     }
 
-    public MethodPair(Method m1,Method m2, boolean dec){
+    public MethodPair(int id,Method m1,Method m2, boolean dec){
+        this.id=id;
         this.method1 = m1;
         this.method2 = m2;
         this.decision = dec;

@@ -1,6 +1,6 @@
 import weka.classifiers.Classifier;
 import weka.classifiers.bayes.NaiveBayes;
-import weka.classifiers.evaluation.Evaluation;
+import weka.classifiers.Evaluation;
 
 import weka.classifiers.trees.REPTree;
 import weka.core.Instance;
@@ -43,7 +43,7 @@ public class WekaTraining {
 
 
         //set classifier option
-        int treeDepth = 4;
+        int treeDepth = 8;
         String[] options = new String[2];
         options[0] = "-L"; options[1] = String.valueOf(treeDepth);
 
@@ -56,15 +56,12 @@ public class WekaTraining {
         //saving model
         weka.core.SerializationHelper.write("tree"+treeDepth+"_model.model",tree);
         //create model evaluation
-         Evaluation eval = new Evaluation(train);
+         Evaluation eval = new Evaluation(data);
         //load test data set
-//        ConverterUtils.DataSource testSource = new ConverterUtils.DataSource("/Users/sidekoiii/Documents/GitHub/SP2019-DoNotCopy/MerryEngine/metricsForTest.csv");
-//        Instances testData = testSource.getDataSet();
-//        testData.setClassIndex(testData.numAttributes()-1);
+
 
         //validate model
         eval.evaluateModel(tree,valid);
-
 
         System.out.println("Evaluation Result on Validate Data set:");
         System.out.println("Correct % : "+ eval.pctCorrect());
@@ -88,28 +85,29 @@ public class WekaTraining {
         System.out.println("FN : "+eval.weightedFalseNegativeRate());
 
         //evaluate model
-        eval.evaluateModel(tree,test);
+        Evaluation eval2 = new Evaluation(data);
+        eval2.evaluateModel(tree,test);
         System.out.println("\n////////////////////////////////////\n");
         System.out.println("Evaluation Result on Test Data set:");
-        System.out.println("Correct % : "+ eval.pctCorrect());
-        System.out.println("Incorrect % : "+eval.pctIncorrect());
+        System.out.println("Correct % : "+ eval2.pctCorrect());
+        System.out.println("Incorrect % : "+eval2.pctIncorrect());
         System.out.println("______________________________________");
-        System.out.println("precision : "+eval.precision(1));
-        System.out.println("recall : "+eval.recall(1));
-        System.out.println("f1 : "+eval.fMeasure(1));
-        System.out.println("precision : "+eval.precision(0));
-        System.out.println("recall : "+eval.recall(0));
-        System.out.println("f1 : "+eval.fMeasure(0));
+        System.out.println("precision : "+eval2.precision(1));
+        System.out.println("recall : "+eval2.recall(1));
+        System.out.println("f1 : "+eval2.fMeasure(1));
+        System.out.println("precision : "+eval2.precision(0));
+        System.out.println("recall : "+eval2.recall(0));
+        System.out.println("f1 : "+eval2.fMeasure(0));
         System.out.println("______________________________________");
         System.out.println("Weight REPORT :");
         System.out.println("Tree Depth : "+ treeDepth);
-        System.out.println("precision : "+eval.weightedPrecision());
-        System.out.println("recall : "+eval.weightedRecall());
-        System.out.println("f1 : "+eval.weightedFMeasure());
-        System.out.println("TP : "+eval.weightedTruePositiveRate());
-        System.out.println("TN : "+eval.weightedTrueNegativeRate());
-        System.out.println("FP : "+eval.weightedFalsePositiveRate());
-        System.out.println("FN : "+eval.weightedFalseNegativeRate());
+        System.out.println("precision : "+eval2.weightedPrecision());
+        System.out.println("recall : "+eval2.weightedRecall());
+        System.out.println("f1 : "+eval2.weightedFMeasure());
+        System.out.println("TP : "+eval2.weightedTruePositiveRate());
+        System.out.println("TN : "+eval2.weightedTrueNegativeRate());
+        System.out.println("FP : "+eval2.weightedFalsePositiveRate());
+        System.out.println("FN : "+eval2.weightedFalseNegativeRate());
 
 //        double label = tree.classifyInstance(test.instance(0);
 //        test.instance(0).setClassValue(label);
