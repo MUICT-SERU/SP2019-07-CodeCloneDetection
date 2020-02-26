@@ -1,5 +1,4 @@
-<html lang="en">
-
+<html>
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -57,29 +56,31 @@
 
 <div class="modal fade" id="ModalCenter" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true" data-keyboard="false" data-backdrop="static">
   <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content" width='300%' height='300%'>
+    <div class="modal-content" style="width:300%">
       <div class="modal-header">
-        <h3 class="modal-title" id="ModalCenterTitle">Processing please wait...</h3>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="size:30px">
+        <h3 class="modal-title" id="ModalCenterTitle" style="font-size:30px">Processing please wait...</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body">
-	<div class="d-flex align-items-center" style="padding-left:5%">
-		<strong style="font-size:30px;">Loading...</strong>
-		<div style="padding-left:35%">
+      <div class="modal-body" id="mordal-body">
+	<div class="d-flex align-items-center" style="padding-left:5%" id="loadingModal">
+		<strong style="font-size:30px;" id="textModal">Loading...</strong>
+		<div style="padding-left:35%" id="checkmarkLoading">
 <div class="circle-loader" >
   <div class="checkmark draw"></div>
 </div>
 </div>
       </div>
-
+			<div id="finishModal" style="font-size:16px"></div>
 			<p><button id="toggle" type="button" class="btn btn-success" style="display:none">Toggle Completed</button></p>
+			<div style="padding-left:40%;size:30px">
+			<a id="viewResultButtonArea" href="./Result.html" class="btn btn-success" style="display:none">view result</a>
+		</div>
     </div>
   </div>
 </div>
 </div>
-<div id="TextOutput" style="padding-left:7%;font:20px"></div>
 </body>
 <script>
 	// We can get the token from the "access_token" query
@@ -102,12 +103,13 @@
 		.then(res => res.json())
 		.then(res =>{
 			window.dataName = `${res.login}`;
+			window.githubPicture = `${res.avatar_url}`;
 			const NameOwner = document.createTextNode(dataName)
 			document.getElementById("Repos").appendChild(NameOwner)
 			const ProfilePicture = document.createElement("img")
 			ProfilePicture.setAttribute("style","width:70px;height:70px;")
 			ProfilePicture.setAttribute("class", "img-thumbnail")
-			ProfilePicture.src = `${res.avatar_url}`;
+			ProfilePicture.src = githubPicture;
 
 			document.getElementById("ProPic").appendChild(ProfilePicture)
 
@@ -189,18 +191,33 @@
 		};
 $('#launchLoading').click()
 		fetch('http://localhost:8001/api/clone', payload).then(async (res) => {
-			const data = await res.json();
-			console.log(data);
+			window.dataCon = await res.json();
+			console.log(dataCon);
 			$('#toggle').click()
-		})
-
-	}
+		// 	var json = `${data.result}`;
+		// 	var jsonArray = json.split("\r\n");
+					document.getElementById("checkmarkLoading").setAttribute("style","padding-left:53%");
+					document.getElementById("ModalCenterTitle").innerHTML = "Result";
+					document.getElementById("textModal").innerHTML = "Done";
+					$('#viewResultButtonArea').fadeIn(2000);
+		// 			$('#finishModal').hide();
+		// 			$('#checkmarkLoading, #textModal').fadeOut(2000, function(){
+		// 	 $('#finishModal').fadeIn();
+	 // });
+// for(i=0; i < jsonArray.length; i++){
+// const result = document.createTextNode(jsonArray[i]);
+// const div = document.getElementById('finishModal');
+//  const br = document.createElement('br');
+// div.appendChild(result);
+// div.appendChild(br);
+		// }
+	})
+}
 	function logoutFunc(){
 		fetch('http://localhost:8001/api/logout', { method:"GET" }).then( async (res)=>{
 			alert("You have logout!");
 		});
 	}
-
 
 </script>
 </html>

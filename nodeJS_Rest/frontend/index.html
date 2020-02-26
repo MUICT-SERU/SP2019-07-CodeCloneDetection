@@ -101,7 +101,6 @@ $('#toggle').click(function() {
       e.preventDefault();
       const url = $('input[name="GitHubURL"]').val();
       clone(url);
-
     });
   });
 
@@ -128,7 +127,6 @@ $('#launchLoading').click()
       const data = await res.json();
       console.log(data);
       $('#toggle').click()
-      
     });
   }
 

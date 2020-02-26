@@ -38,55 +38,27 @@
 </nav>
 
 <div id="TextOutput" style="padding-left:7%;font:20px"></div>
-
 </body>
 <script>
 
   const query = window.location.search.substring(1)
   const token = query.split('access_token=')[1]
 
-// fetch('https://api.github.com/user',{
-//   headers: new Headers({
-//       'Authorization': 'token ' + token,
-//       }),
-//     }, {method : 'GET'})
-//   // Parse the response as JSON
-//   .then(res => res.json())
-//   .then(res =>{
-//     const NameOwner = document.createTextNode(`${res.login}`)
-//     document.getElementById("Repos").appendChild(NameOwner)
-//     const ProfilePicture = document.createElement("img")
-//     ProfilePicture.setAttribute("style","width:70px;height:70px;")
-//     ProfilePicture.setAttribute("class", "img-thumbnail")
-//     ProfilePicture.src = `${res.avatar_url}`;
-//
-//     document.getElementById("ProPic").appendChild(ProfilePicture)
-//
-//   })
-
-
-	fetch('http://localhost:8001/api/readFile', {mode:'no-cors'})
-
-.then(res => res.json())
-.then(res=>{
-	var json = `${res.owner}`;
-// 	var originalMsg = JSON.stringify(json);
-// 	console.log(json)
-// console.log(originalMsg)
-// var updatedMsg = originalMsg.replace(/\r\n/g, "<br>");
-// console.log(updatedMsg)
-// var newObj = JSON.parse(updatedMsg);
-// console.log(newObj);
-	var jsonArray = json.split("\r\n");
-	var objResult = JSON.stringify(json);
-	for(i=0; i < jsonArray.length; i++){
-	const result = document.createTextNode(jsonArray[i]);
-	const div = document.getElementById('TextOutput');
-		const br = document.createElement('br');
-	div.appendChild(result);
-	div.appendChild(br);
-}
+fetch('http://localhost:8001/api/getResult').then(async (res) => {
+	const data = await res.json();
+	console.log(data);
+		var json = `${data[0].result}`;
+		var jsonArray = json.split("\r\n");
+for(i=0; i < jsonArray.length; i++){
+const splitedResult = document.createTextNode(jsonArray[i]);
+const div = document.getElementById('TextOutput');
+ const br = document.createElement('br');
+div.appendChild(splitedResult);
+div.appendChild(br);
+	}
 })
+
+
 
   </script>
 </html>

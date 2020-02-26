@@ -1,12 +1,16 @@
-let util = require('util')
-let exec = require('child_process').exec
-let exec_prom = util.promisify(exec)
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/";
 
-exec_prom('ls').then(()=>{console.log('done')})
-
-
-async function doNext(){
-  await exec_prom('ls');
-  // do something after
-  console.log("This is my ip");
-}
+MongoClient.connect(url, {
+useUnifiedTopology: true,
+useNewUrlParser: true,
+}, function(err, db) {
+  if (err) throw err;
+  var dbo = db.db("Data");
+  var myobj = { name: "Company Inc", address: "Highway 37" };
+    dbo.collection("analysedClone").insertOne(myobj, function(err, res) {
+      if (err) throw err;
+      console.log("document inserted");
+      db.close();
+});
+});
