@@ -18,4 +18,4 @@ Found 10 duplicate lines with fingerprint 8e89f6bfb2a09a94417cb3ec9c56fbca in th
 =====================================================================
 Found 20 duplicate lines in 2 blocks in 1 files
 Processed a total of 1905 significant (3447 raw) lines in 16 files
-Processing time: 0.829sec
+Processing time: 0.583sec

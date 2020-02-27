@@ -1,5 +1,4 @@
-<html lang="en">
-
+<html>
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -51,42 +50,37 @@
 </table>
 
  <!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalCenter">
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalCenter" id="launchLoading" style="display:none">
   Launch demo modal
 </button>
 
-<div class="modal fade" id="ModalCenter" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+<div class="modal fade" id="ModalCenter" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true" data-keyboard="false" data-backdrop="static">
   <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content" width='300%' height='300%'>
+    <div class="modal-content" style="width:300%">
       <div class="modal-header">
-        <h3 class="modal-title" id="ModalCenterTitle">Processing please wait...</h3>
+        <h3 class="modal-title" id="ModalCenterTitle" style="font-size:30px">Processing please wait...</h3>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body">
-
-				<div class="d-flex align-items-center">
-					 <strong style="font-size:16px" >Cloning from GitHub</strong>
-					 <div style="padding-right:30%">
-	<div class="circle-loader">
-	  <div class="checkmark draw"></div>
-	</div>
-</div>
-</div>
-	<div class="d-flex align-items-center" style="padding-top:3%">
-		<strong style="font-size:16px">Analyzing Clone</strong>
+      <div class="modal-body" id="mordal-body">
+	<div class="d-flex align-items-center" style="padding-left:5%" id="loadingModal">
+		<strong style="font-size:30px;" id="textModal">Loading...</strong>
+		<div style="padding-left:35%" id="checkmarkLoading">
 <div class="circle-loader" >
   <div class="checkmark draw"></div>
 </div>
+</div>
       </div>
-
-			<p><button id="toggle" type="button" class="btn btn-success">Toggle Completed</button></p>
+			<div id="finishModal" style="font-size:16px"></div>
+			<p><button id="toggle" type="button" class="btn btn-success" style="display:none">Toggle Completed</button></p>
+			<div style="padding-left:40%;size:30px">
+			<a id="viewResultButtonArea" href="./Result.html" class="btn btn-success" style="display:none">view result</a>
+		</div>
     </div>
   </div>
 </div>
 </div>
-
 </body>
 <script>
 	// We can get the token from the "access_token" query
@@ -108,12 +102,14 @@
 		// Parse the response as JSON
 		.then(res => res.json())
 		.then(res =>{
-			const NameOwner = document.createTextNode(`${res.login}`)
+			window.dataName = `${res.login}`;
+			window.githubPicture = `${res.avatar_url}`;
+			const NameOwner = document.createTextNode(dataName)
 			document.getElementById("Repos").appendChild(NameOwner)
 			const ProfilePicture = document.createElement("img")
 			ProfilePicture.setAttribute("style","width:70px;height:70px;")
 			ProfilePicture.setAttribute("class", "img-thumbnail")
-			ProfilePicture.src = `${res.avatar_url}`;
+			ProfilePicture.src = githubPicture;
 
 			document.getElementById("ProPic").appendChild(ProfilePicture)
 
@@ -123,7 +119,7 @@
 	fetch('https://api.github.com/user/repos', {
 		headers: new Headers({
         'Authorization': 'token ' + token,
-    		}),
+			}),
 			})
 		// Parse the response as JSON
 		.then(res => res.json())
@@ -140,18 +136,16 @@
 			for(i=0; i<res.length; i++){
 				const tr = document.createElement('tr');
 			for(j = 0 ; j < 4 ; j++){
-
+				var repoName = `${res[i].name}`;
+				var url = `${res[i].clone_url}`;
 				const count = document.createTextNode(i+1)
-				const reposName = document.createTextNode(`${res[i].name}`)
-				const reposCloneURL = document.createTextNode(`${res[i].clone_url}`)
+				const reposName = document.createTextNode(repoName)
+				const reposCloneURL = document.createTextNode(url)
 
-				const url = `${res[i].clone_url}`;
 				const ActionButton = document.createElement('button')
 				ActionButton.innerHTML = "Click to Analyze"
 				ActionButton.setAttribute("id","AnalyzeButton"+[i])
-				ActionButton.setAttribute("data-toggle" , "modal")
-				ActionButton.setAttribute("data-target", "#ModalCenter")
-				ActionButton.setAttribute("onclick","clone('"+url+"')")
+				ActionButton.setAttribute("onclick","clone('"+url+"','"+repoName+"')")
 
 				const ResultButton = document.createElement('button')
 				ResultButton.innerHTML = "Result"
@@ -179,10 +173,8 @@
 				tbl.appendChild(tblBody);
 
 	})
-	function clone(url) {
-
-		const data = {github: url};
-
+	function clone(url, repoName) {
+		var data = ({github: url, user: dataName, reposName: repoName});
 		const headers = {
 			'Accept': 'application/json',
 			'Content-Type': 'application/json'
@@ -197,16 +189,30 @@
 			headers,
 			body,
 		};
-
+$('#launchLoading').click()
 		fetch('http://localhost:8001/api/clone', payload).then(async (res) => {
-			const data = await res.json();
-			console.log(data);
-		}).then(res=> {
-			if(res.status == '200'){
-				console.log('status:ok');
-			}
-		})
-	}
+			window.dataCon = await res.json();
+			console.log(dataCon);
+			$('#toggle').click()
+		// 	var json = `${data.result}`;
+		// 	var jsonArray = json.split("\r\n");
+					document.getElementById("checkmarkLoading").setAttribute("style","padding-left:53%");
+					document.getElementById("ModalCenterTitle").innerHTML = "Result";
+					document.getElementById("textModal").innerHTML = "Done";
+					$('#viewResultButtonArea').fadeIn(2000);
+		// 			$('#finishModal').hide();
+		// 			$('#checkmarkLoading, #textModal').fadeOut(2000, function(){
+		// 	 $('#finishModal').fadeIn();
+	 // });
+// for(i=0; i < jsonArray.length; i++){
+// const result = document.createTextNode(jsonArray[i]);
+// const div = document.getElementById('finishModal');
+//  const br = document.createElement('br');
+// div.appendChild(result);
+// div.appendChild(br);
+		// }
+	})
+}
 	function logoutFunc(){
 		fetch('http://localhost:8001/api/logout', { method:"GET" }).then( async (res)=>{
 			alert("You have logout!");

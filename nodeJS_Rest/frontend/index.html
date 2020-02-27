@@ -65,7 +65,7 @@
   Launch demo modal
 </button>
 
-<div class="modal fade" id="ModalCenter" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+<div class="modal fade" id="ModalCenter" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true"  data-keyboard="false" data-backdrop="static">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -75,26 +75,24 @@
         </button>
       </div>
       <div class="modal-body">
-
-				<div class="d-flex align-items-center">
-					 <strong style="font-size:16px" >Cloning from GitHub</strong>
-					 <div style="padding-right:30%">
-	<div class="circle-loader">
-	  <div class="checkmark draw"></div>
-	</div>
-</div>
-</div>
-	<div class="d-flex align-items-center" style="padding-top:3%">
-		<strong style="font-size:16px">Analyzing Clone</strong>
-<div class="circle-loader" >
-  <div class="checkmark draw"></div>
-</div>
+        <div class="d-flex align-items-center" style="padding-left:5%">
+      		<strong style="font-size:30px;">Loading...</strong>
+      		<div style="padding-left:35%">
+      <div class="circle-loader" >
+        <div class="checkmark draw"></div>
       </div>
+</div>
+</div>
+			<p><button id="toggle" type="button" class="btn btn-success" style="display:none">Toggle Completed</button></p>
     </div>
   </div>
 </div>
 </div>
 <script>
+$('#toggle').click(function() {
+  $('.circle-loader').toggleClass('load-complete');
+  $('.checkmark').toggle();
+});
   //jquery for receive the url from a form
   $(document).ready(function() {
     //id = github
@@ -103,7 +101,6 @@
       e.preventDefault();
       const url = $('input[name="GitHubURL"]').val();
       clone(url);
-
     });
   });
 
@@ -125,10 +122,11 @@
       headers,
       body,
     };
-
-    fetch('http://localhost:8001/api/clone', payload).then(async (res) => {
+$('#launchLoading').click()
+    fetch('http://localhost:8001/api/guestclone', payload).then(async (res) => {
       const data = await res.json();
       console.log(data);
+      $('#toggle').click()
     });
   }
 
