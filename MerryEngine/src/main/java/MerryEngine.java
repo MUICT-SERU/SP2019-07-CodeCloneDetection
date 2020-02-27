@@ -132,20 +132,15 @@ public class MerryEngine {
         if(cmd.isTraining()){
             BufferedReader csvTrainingTrueReader = new BufferedReader(new FileReader("SelectedClones.csv"));
             String pair;
+            int pairIDSetter = 0;
             while ((pair = csvTrainingTrueReader.readLine()) != null) {
                 String[] data = pair.split(",");
                 Method m1 = methodHashMap.get(data[0].replace(".java","")+data[1]+data[2]);
-//                if(!m1.isVectorSet()){
-//                    m1.setCode2vecVector(m1.getC2vVectorAsString(),vecSize);
-//                }
-//                System.out.println("Method 1 : "+ m1.toString());
                 Method m2 = methodHashMap.get(data[4].replace(".java","")+data[5]+data[6]);
-//                if(!m2.isVectorSet()){
-//                    m2.setCode2vecVector(m2.getC2vVectorAsString(),vecSize);
-//                }
                 if(m1!=null&&m2!=null){
                     if(m1.isVectorSet()&&m2.isVectorSet()){
-                        methodPairList.add(new MethodPair(m1,m2,true));
+                        methodPairList.add(new MethodPair(pairIDSetter,m1,m2,true));
+                        pairIDSetter++;
                     }
                 }
 
@@ -155,16 +150,11 @@ public class MerryEngine {
             while ((pair = csvTrainingFalseReader.readLine()) != null) {
                 String[] data = pair.split(",");
                 Method m1 = methodHashMap.get(data[0].replace(".java","")+data[1]+data[2]);
-//                if(!m1.isVectorSet()){
-//                    m1.setCode2vecVector(m1.getC2vVectorAsString(),vecSize);
-//                }
                 Method m2 = methodHashMap.get(data[4].replace(".java","")+data[5]+data[6]);
-//                if(!m2.isVectorSet()){
-//                    m2.setCode2vecVector(m2.getC2vVectorAsString(),vecSize);
-//                }
                 if(m1!=null&&m2!=null){
                     if(m1.isVectorSet()&&m2.isVectorSet()){
-                        methodPairList.add(new MethodPair(m1,m2,false));
+                        methodPairList.add(new MethodPair(pairIDSetter,m1,m2,false));
+                        pairIDSetter++;
                     }
                 }
             }
@@ -173,6 +163,7 @@ public class MerryEngine {
             for (Map.Entry<String, Method> entry : methodHashMap.entrySet()) {
                 methodList.add(entry.getValue());
             }
+            int pairIDSetter= 0;
             for(int i = 0 ; i < methodList.size();i++){
                 for(int j=i+1 ; j< methodList.size();j++){
                     //size filter
@@ -182,12 +173,14 @@ public class MerryEngine {
                         int m2Tokens = methodList.get(j).getTokenNo();
                         double T = cmd.getSizeFilterThreshold();
                         if(m1Tokens * T <= m2Tokens && m2Tokens <= m1Tokens/T){
-                            MethodPair methodPair = new MethodPair(methodList.get(i),methodList.get(j));
+                            MethodPair methodPair = new MethodPair(pairIDSetter,methodList.get(i),methodList.get(j));
                             methodPairList.add(methodPair);
+                            pairIDSetter++;
                         }
                     }else{
-                        MethodPair methodPair = new MethodPair(methodList.get(i),methodList.get(j));
+                        MethodPair methodPair = new MethodPair(pairIDSetter,methodList.get(i),methodList.get(j));
                         methodPairList.add(methodPair);
+                        pairIDSetter++;
                     }
                     //end size filter
                 }
@@ -195,6 +188,8 @@ public class MerryEngine {
         }
 if(cmd.isTraining()){
     FileWriter csvWriter = new FileWriter("trainModelMetrics.csv");
+    csvWriter.append("PairID");
+    csvWriter.append(",");
     csvWriter.append("DiffLOC");
     csvWriter.append(",");
     csvWriter.append("DiffIdentifierNo");
@@ -211,11 +206,11 @@ if(cmd.isTraining()){
     csvWriter.append(",");
     csvWriter.append("DiffUniqueTokenNo");
     csvWriter.append(",");
-    csvWriter.append("SimilarFileNameScore");
+    csvWriter.append("DiffFileNameScore");
     csvWriter.append(",");
-    csvWriter.append("SimilarMethodNameScore");
+    csvWriter.append("DiffMethodNameScore");
     csvWriter.append(",");
-    csvWriter.append("SameReturnType");
+    csvWriter.append("IsSameReturnType");
     csvWriter.append(",");
     for(int j=0 ; j<12 ; j++){
         csvWriter.append("c2v_"+j);
@@ -225,6 +220,8 @@ if(cmd.isTraining()){
     for (int i = 0; i<methodPairList.size();i++){
         MethodPair mp = methodPairList.get(i);
         csvWriter.append("\n ");
+        csvWriter.append(mp.getId()+"");
+        csvWriter.append(",");
         csvWriter.append(mp.getDiffLOC()+"");
         csvWriter.append(",");
         csvWriter.append(mp.getDiffIdentifierNo()+"");
@@ -259,6 +256,8 @@ if(cmd.isTraining()){
     csvWriter.close();
 }else{
     FileWriter csvWriter = new FileWriter("metrics.csv");
+    csvWriter.append("PairID");
+    csvWriter.append(",");
     csvWriter.append("DiffLOC");
     csvWriter.append(",");
     csvWriter.append("DiffIdentifierNo");
@@ -275,20 +274,22 @@ if(cmd.isTraining()){
     csvWriter.append(",");
     csvWriter.append("DiffUniqueTokenNo");
     csvWriter.append(",");
-    csvWriter.append("SimilarFileNameScore");
+    csvWriter.append("DiffFileNameScore");
     csvWriter.append(",");
-    csvWriter.append("SimilarMethodNameScore");
+    csvWriter.append("DiffMethodNameScore");
     csvWriter.append(",");
-    csvWriter.append("SameReturnType");
+    csvWriter.append("IsSameReturnType");
     csvWriter.append(",");
     for(int j=0 ; j<11 ; j++){
         csvWriter.append("c2v_"+j);
         csvWriter.append(",");
     }
-    csvWriter.append("c2v_11");
+    csvWriter.append("c2v_11,Decision");
     for (int i = 0; i<methodPairList.size();i++){
         MethodPair mp = methodPairList.get(i);
         csvWriter.append("\n ");
+        csvWriter.append(mp.getId()+"");
+        csvWriter.append(",");
         csvWriter.append(mp.getDiffLOC()+"");
         csvWriter.append(",");
         csvWriter.append(mp.getDiffIdentifierNo()+"");
@@ -316,7 +317,7 @@ if(cmd.isTraining()){
             csvWriter.append(c2v[j]+"");
             csvWriter.append(",");
         }
-        csvWriter.append(c2v[11]+"");
+        csvWriter.append(c2v[11]+",?");
     }
     csvWriter.flush();
     csvWriter.close();

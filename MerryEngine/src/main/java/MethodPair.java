@@ -19,15 +19,18 @@ public class MethodPair {
     private boolean isSameReturnType;
     private double[] code2VecSimilarityScore = new double[12];
     private boolean decision = Boolean.parseBoolean(null);
+    private int id;
 
-    public MethodPair(Method m1,Method m2){
+    public MethodPair(int id,Method m1,Method m2){
+        this.id = id;
         this.method1 = m1;
         this.method2 = m2;
         computeMetrics();
         computeCode2VecSimilarity();
     }
 
-    public MethodPair(Method m1,Method m2, boolean dec){
+    public MethodPair(int id,Method m1,Method m2, boolean dec){
+        this.id=id;
         this.method1 = m1;
         this.method2 = m2;
         this.decision = dec;
@@ -179,6 +182,14 @@ public class MethodPair {
 
     public double[] getCode2VecSimilarityScore() {
         return code2VecSimilarityScore;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
     }
 }
 
