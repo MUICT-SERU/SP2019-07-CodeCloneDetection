@@ -108,7 +108,7 @@ public class MerryEngine {
         }
 
         int ch =0;
-        BufferedReader csvReader = new BufferedReader(new FileReader("c2vVector.csv"));
+        BufferedReader csvReader = new BufferedReader(new FileReader("assets/c2vVector.csv"));
         String row;
         while ((row = csvReader.readLine()) != null) {
             ch++;
@@ -187,7 +187,7 @@ public class MerryEngine {
             }
         }
 if(cmd.isTraining()){
-    FileWriter csvWriter = new FileWriter("trainModelMetrics.csv");
+    FileWriter csvWriter = new FileWriter("assets/trainModelMetrics.csv");
     csvWriter.append("PairID");
     csvWriter.append(",");
     csvWriter.append("DiffLOC");
@@ -255,7 +255,7 @@ if(cmd.isTraining()){
     csvWriter.flush();
     csvWriter.close();
 }else{
-    FileWriter csvWriter = new FileWriter("metrics.csv");
+    FileWriter csvWriter = new FileWriter("assets/metrics.csv");
     csvWriter.append("PairID");
     csvWriter.append(",");
     csvWriter.append("DiffLOC");
@@ -322,6 +322,31 @@ if(cmd.isTraining()){
     csvWriter.flush();
     csvWriter.close();
 }
+if(cmd.isTraining()){
+
+}else{
+    Weka.main();
+    String prediction ;
+    String result ="method1Name,method1Start,Method1End,method1SourceCode,method2Name,method2Start,Method2End,method2SourceCode" ;
+    BufferedReader modelResultReader = new BufferedReader(new FileReader("result/result1.csv"));
+    while ((prediction = modelResultReader.readLine()) != null) {
+        String[] data = prediction.split(",");
+        if(data[data.length-1].equalsIgnoreCase("true")){
+            int id = Integer.parseInt(data[0]);
+            if(id == methodPairList.get(id).getId()){
+                Method m1 = methodPairList.get(id).getMethod1();
+                Method m2 = methodPairList.get(id).getMethod2();
+                result += "\n"+m1.getFileName()+","+m1.getStartLine()+","+m1.getEndLine()+","+m1.getSourceCode()+","+m2.getFileName()+","+m2.getStartLine()+","+m2.getEndLine()+","+m2.getSourceCode();
+            }
+        }
+    }
+    FileWriter cloneWriter = new FileWriter("result/clonesResult.csv");
+    cloneWriter.write(result);
+}
+
+
+
+
 //        System.out.println("Sample Metric ... \n" + methodList.get(5).getMetricsAsString());
         System.out.println("Method Pair List size : " + methodPairList.size());
         Date endDate= new Date();
@@ -336,7 +361,6 @@ if(cmd.isTraining()){
 
     public static void search(final String pattern, final File folder, List<String> result) {
         for (final File f : folder.listFiles()) {
-
             if (f.isDirectory()) {
                 search(pattern, f, result);
             }

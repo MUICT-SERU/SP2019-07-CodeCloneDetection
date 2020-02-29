@@ -13,7 +13,7 @@ import java.awt.*;
 import java.io.File;
 
 public class Weka{
-    public static void main(String[] args) throws Exception {
+    public static void main() throws Exception {
         //Load model
         String modelName = "models/tree8_model.model";
         REPTree treeModel = (REPTree) weka.core.SerializationHelper.read(modelName);
