@@ -81,6 +81,7 @@
   </div>
 </div>
 </div>
+<button onclick="gotoHistory()">history</button>
 </body>
 <script>
 	// We can get the token from the "access_token" query
@@ -218,6 +219,14 @@ $('#launchLoading').click()
 			alert("You have logout!");
 		});
 	}
-
+function gotoHistory(){
+	var urlString = window.location.search;
+	urlSplit = urlString.split("=");
+	accessToken = urlSplit[1];
+	fetch('http://localhost:8001/history/?accessToken='+accessToken, { method:"GET", redirect:"follow" }).then( res => {
+		if (res.redirected) {
+            window.location.href = res.url;
+        } })
+}
 </script>
 </html>

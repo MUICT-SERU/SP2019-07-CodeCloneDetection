@@ -21,6 +21,7 @@ var dburl = "mongodb://localhost:27017/";
 
 const lineReader = require('line-reader');
 
+var accessToken;
 // Declare the redirect route
 app.get('/oauth/redirect', (req, res) => {
   // The req.query object has the query params that
@@ -41,7 +42,7 @@ app.get('/oauth/redirect', (req, res) => {
     // Once we get the response, extract the access token from
     // the response body
     console.log(response.data);
-    const accessToken = response.data.access_token
+    accessToken= response.data.access_token;
     //const username = response.data.username
     // redirect the user to the welcome page, along with the access token
     res.redirect(`/welcome.html?access_token=${accessToken}`)
@@ -62,7 +63,7 @@ app.post('/api/clone', function(req, res) {
 
       // <script>document.getElementById('toggle').click();</script>
     })
-    execSync('java -jar simian-2.5.10.jar -reportDuplicateText ./temp/*.java > .\\output.txt | type .\\output.txt', (error, stdout, stderr) => {
+    execSync('java -jar simian-2.5.10.jar -reportDuplicateText ./temp/**.java > .\\output.txt | type .\\output.txt', (error, stdout, stderr) => {
       if (error) {
           console.error(`exec error: ${error}`);
         }
@@ -151,14 +152,30 @@ app.get('/api/getResult', function(req, res){
  });
 
  app.get('/history', function(req, res){
-   var name = "weekitaus";
-   res.redirect('./history.html?name='+name);
+   res.redirect(`http://localhost:8001/history.html?access_token=${req.query.accessToken}`);
  })
 
+app.post('/getHistory', function(req, res){
+  MongoClient.connect(dburl, {
+  useUnifiedTopology: true,
+  useNewUrlParser: true,
+  }, function(err, db) {
+    if (err) throw err;
+    var dbo = db.db("Data");
+    //Sort the result by name:
+  var quary = {owner: req.body.owner};
+    var sort = { date: -1 };
+    dbo.collection("analysedClone").find().sort(sort).toArray(function(err, result) {
+      if (err) throw err;
+        res.json(result);
+      console.log(result);
+      db.close();
+    });
+  });
+})
 // app.delete('/api/logout', function(req, res){
 //   res.redirect('/');
 // });
-
 //localhost 8001
 app.listen(global.gConfig.node_port,() => {
   console.log(`${global.gConfig.app_name} listening on port ${global.gConfig.node_port}`);
