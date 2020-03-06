@@ -53,16 +53,15 @@ app.use(express.static(__dirname + '/frontend'))
 
 app.post('/api/clone', function(req, res) {
 
-  execSync('git clone '+`${req.body.github} ./temp`, (error, stdout, stderr) => {
-    if (error) {
-        console.error(`exec error: ${error}`);
-        return;
-      }
-      console.log(`stdout: ${stdout}`);
-      // console.error(`stderr: ${stderr}`);
+  const args = [
+    "clone",
+    `${req.body.github}`,
+    "./temp"
+  ];
 
-      // <script>document.getElementById('toggle').click();</script>
-    })
+  const child = require("child_process").spawnSync("git", args);
+console.log(`${child.stderr}`);
+      // console.error(`stderr: ${stderr}`);
     execSync('java -jar simian-2.5.10.jar -reportDuplicateText ./temp/**.java > .\\output.txt | type .\\output.txt', (error, stdout, stderr) => {
       if (error) {
           console.error(`exec error: ${error}`);
@@ -99,6 +98,7 @@ app.post('/api/clone', function(req, res) {
         });
         res.json(obj);
 })
+
 
 app.post('/api/guestclone', function(req, res) {
 
@@ -154,7 +154,30 @@ app.get('/api/getResult', function(req, res){
  app.get('/history', function(req, res){
    res.redirect(`http://localhost:8001/history.html?access_token=${req.query.accessToken}`);
  })
-
+ app.get('/welcome', function(req, res){
+   res.redirect(`http://localhost:8001/welcome.html?access_token=${req.query.accessToken}`);
+ })
+ app.get('/historyRepo', function(req, res){
+   res.redirect(`http://localhost:8001/historyRepo.html?repository=${req.query.repository}&access_token=${req.query.accessToken}`);
+ })
+ app.post('/getHistoryRepo', function(req, res){
+   MongoClient.connect(dburl, {
+   useUnifiedTopology: true,
+   useNewUrlParser: true,
+   }, function(err, db) {
+     if (err) throw err;
+     var dbo = db.db("Data");
+     //Sort the result by name:
+   var quary = {owner: req.body.owner, repoName: req.body.reposName};
+     var sort = { date: -1 };
+     dbo.collection("analysedClone").find(quary).sort(sort).toArray(function(err, result) {
+       if (err) throw err;
+         res.json(result);
+       console.log("Query success!");
+       db.close();
+     });
+   });
+ })
 app.post('/getHistory', function(req, res){
   MongoClient.connect(dburl, {
   useUnifiedTopology: true,
@@ -165,10 +188,10 @@ app.post('/getHistory', function(req, res){
     //Sort the result by name:
   var quary = {owner: req.body.owner};
     var sort = { date: -1 };
-    dbo.collection("analysedClone").find().sort(sort).toArray(function(err, result) {
+    dbo.collection("analysedClone").find(quary).sort(sort).toArray(function(err, result) {
       if (err) throw err;
         res.json(result);
-      console.log(result);
+      console.log("Query success!");
       db.close();
     });
   });

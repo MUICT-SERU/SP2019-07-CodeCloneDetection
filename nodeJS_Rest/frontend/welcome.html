@@ -5,7 +5,6 @@
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 		 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
@@ -23,8 +22,8 @@
 								<img src="/images/logo.png" alt="Merry's logo" style="width:70px;height:70px;">
 							</a>
 					</li>
-				<li class="nav-item" style="padding-top:15%">
-						<a class="nav-link" href="/Result.html">Result</a>
+				<li class="nav-item" style="padding-top:20%">
+						<span class="nav-link" id="fake-link-1" style="color: blue;cursor: pointer;">History</span>
 				</li>
 			</ul>
  <ul class="nav justify-content-end" id="menu" style="padding-left:83%">
@@ -81,7 +80,7 @@
   </div>
 </div>
 </div>
-<button onclick="gotoHistory()">history</button>
+
 </body>
 <script>
 	// We can get the token from the "access_token" query
@@ -137,21 +136,22 @@
 			for(i=0; i<res.length; i++){
 				const tr = document.createElement('tr');
 			for(j = 0 ; j < 4 ; j++){
-				var repoName = `${res[i].name}`;
+				var NameRepo = `${res[i].name}`;
 				var url = `${res[i].clone_url}`;
 				const count = document.createTextNode(i+1)
-				const reposName = document.createTextNode(repoName)
+				const reposName = document.createTextNode(NameRepo)
 				const reposCloneURL = document.createTextNode(url)
 
 				const ActionButton = document.createElement('button')
 				ActionButton.innerHTML = "Click to Analyze"
 				ActionButton.setAttribute("id","AnalyzeButton"+[i])
-				ActionButton.setAttribute("onclick","clone('"+url+"','"+repoName+"')")
+				ActionButton.setAttribute("onclick","clone('"+url+"','"+`${res[i].name}`+"')")
 
 				const ResultButton = document.createElement('button')
-				ResultButton.innerHTML = "Result"
+				ResultButton.innerHTML = "Previous Analyzed"
 				ResultButton.setAttribute("id", "Resultnum"+[i])
 				ResultButton.setAttribute("style", "margin-left:8%;")
+				ResultButton.setAttribute("onclick", "gotoOldResult('"+`${res[i].name}`+"')")
 
 			  const td = document.createElement('td');
 				if(j==0){
@@ -174,8 +174,8 @@
 				tbl.appendChild(tblBody);
 
 	})
-	function clone(url, repoName) {
-		var data = ({github: url, user: dataName, reposName: repoName});
+	function clone(url, NameRepo) {
+		var data = ({github: url, user: dataName, reposName: NameRepo});
 		const headers = {
 			'Accept': 'application/json',
 			'Content-Type': 'application/json'
@@ -214,19 +214,29 @@ $('#launchLoading').click()
 		// }
 	})
 }
+	function gotoOldResult(repoData){
+		var urlString = window.location.search;
+		urlSplit = urlString.split("=");
+		accessToken = urlSplit[1];
+		fetch('http://localhost:8001/historyRepo/?repository='+repoData+'&accessToken='+accessToken, { method:"GET", redirect:"follow" }).then( res => {
+			if (res.redirected) {
+							window.location.href = res.url;
+					} })
+	}
+
 	function logoutFunc(){
 		fetch('http://localhost:8001/api/logout', { method:"GET" }).then( async (res)=>{
 			alert("You have logout!");
 		});
 	}
-function gotoHistory(){
+$('#fake-link-1').click(function(){
 	var urlString = window.location.search;
 	urlSplit = urlString.split("=");
-	accessToken = urlSplit[1];
-	fetch('http://localhost:8001/history/?accessToken='+accessToken, { method:"GET", redirect:"follow" }).then( res => {
+	accessToken = urlSplit[1]
+	fetch('http://localhost:8001/history/?accessToken='+token, { method:"GET", redirect:"follow" }).then(res => {
 		if (res.redirected) {
             window.location.href = res.url;
         } })
-}
+})
 </script>
 </html>

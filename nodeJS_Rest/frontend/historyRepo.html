@@ -34,7 +34,7 @@
           </li>
         </ul>
   </nav>
-  <a id="OwnerName" style="font-size: 50;padding-top: 50px;padding-left: 25px;"> Analyzed Repositories of </a>
+  <a id="TitleRepo" style="font-size: 50;padding-top: 50px;padding-left: 25px;"> History of </a>
   <table id="showRepos" class="table table-bordered" style="width:98%" align="center">
   	<thead>
   <tr>
@@ -50,6 +50,10 @@
 <script>
 const query = window.location.search.substring(1)
 const token = query.split('access_token=')[1]
+
+var urlData = window.location.search;
+var respositoryName = urlData.substring( urlData.indexOf("=")+1, urlData.indexOf("&"))
+
 fetch('https://api.github.com/user',{
   headers: new Headers({
       'Authorization': 'token ' + token,
@@ -60,8 +64,8 @@ fetch('https://api.github.com/user',{
   .then(res =>{
     var githubName = `${res.login}`;
     var githubPicture = `${res.avatar_url}`;
-    const NameOwner = document.createTextNode(githubName)
-    document.getElementById("OwnerName").appendChild(NameOwner)
+    const NameRepo = document.createTextNode(respositoryName)
+    document.getElementById("TitleRepo").appendChild(NameRepo)
     const ProfilePicture = document.createElement("img")
     ProfilePicture.setAttribute("style","width:70px;height:70px;")
     ProfilePicture.setAttribute("class", "img-thumbnail")
@@ -70,15 +74,14 @@ fetch('https://api.github.com/user',{
     document.getElementById("ProPic").appendChild(ProfilePicture)
     getMongoData(`${res.login}`);
   })
+function getMongoData(githubName){
 
-  function getMongoData(githubName){
-  var data = ({owner: githubName});
+  var data = ({owner: githubName, reposName: respositoryName});
 
   const headers = {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
   };
-
   const method = 'POST';
 
   const body = JSON.stringify(data);
@@ -88,9 +91,8 @@ fetch('https://api.github.com/user',{
     headers,
     body,
   };
-  fetch('http://localhost:8001/getHistory', payload).then(async (res)=>{
+  fetch('http://localhost:8001/getHistoryRepo', payload).then(async (res)=>{
     const data = await res.json();
-  	console.log(data[1].repoName);
       const tbl = document.getElementById('showRepos')
       const tblBody = document.createElement('tbody')
       for(i=0; i<data.length; i++){
@@ -126,7 +128,6 @@ fetch('https://api.github.com/user',{
         tbl.appendChild(tblBody);
       })
     }
-
   function logoutFunc(){
     fetch('http://localhost:8001/api/logout', { method:"GET" }).then( async (res)=>{
       alert("You have logout!");
@@ -141,6 +142,5 @@ fetch('https://api.github.com/user',{
               window.location.href = res.url;
           } })
   })
-
 </script>
 </html>
