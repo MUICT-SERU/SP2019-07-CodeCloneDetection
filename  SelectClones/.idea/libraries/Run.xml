@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Run">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/Run/CCLearner_Feature.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Run/CCLearner_Test.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Run/CCLearner_Train.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
