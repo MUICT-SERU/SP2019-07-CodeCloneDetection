@@ -30,6 +30,7 @@ public class Method {
     private double[] code2vecVector ;
     private boolean vectorSet;
     private String c2vVectorAsString;
+    private String BCBFileName;
 
 
     public Method(int start, int end, String path,String fileName, String code, String name,String type) throws Exception {
@@ -43,6 +44,7 @@ public class Method {
         this.returnType = type;
         this.vectorSet = false;
         this.id = fileName+start+end;
+        this.BCBFileName = fileName;
         gatherMetrics();
     }
 
@@ -251,5 +253,13 @@ public class Method {
                 "\nUnique Operation No : " + this.uniqueOperatorNo +
                 "\nToken type diversity : " + this.tokenTypeDiversity;
         return s;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getBCBFileName() {
+        return BCBFileName;
     }
 }

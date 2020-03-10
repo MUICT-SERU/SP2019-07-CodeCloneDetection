@@ -5,6 +5,7 @@ public class CommandLineArgument {
     private int code2vecSize = 384;
     private boolean training = false;
     private int treeDepth = 8;
+    private String execID = "";
 
     public CommandLineArgument(String[] args){
         for(int i=0;i< args.length;i++) {
@@ -40,6 +41,9 @@ public class CommandLineArgument {
                     this.treeDepth = 8;
                 }
             }
+            if(args[i].equalsIgnoreCase("-execID" )){
+                this.execID = args[i+1];
+            }
         }
     }
 
@@ -65,5 +69,9 @@ public class CommandLineArgument {
 
     public int getTreeDepth() {
         return treeDepth;
+    }
+
+    public String getExecID() {
+        return execID;
     }
 }
