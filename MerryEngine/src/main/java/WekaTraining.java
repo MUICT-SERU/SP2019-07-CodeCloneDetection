@@ -59,9 +59,9 @@ public class WekaTraining {
         test.setClassIndex(test.numAttributes()-1);
 
         //set classifier option
-        int treeDepth = wekaConfig.getTreeDepth();
+        int treeDepth = 6;//wekaConfig.getTreeDepth();
         String[] options = new String[2];
-        options[0] = "-L"; options[1] = String.valueOf(treeDepth);
+        options[0] = "-L"; options[1] = treeDepth+"";
 
         //Build the classifier
         REPTree tree = new REPTree();
