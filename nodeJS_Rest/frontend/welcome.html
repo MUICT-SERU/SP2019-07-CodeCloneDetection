@@ -193,7 +193,6 @@
 $('#launchLoading').click()
 		fetch('http://localhost:8001/api/clone', payload).then(async (res) => {
 			window.dataCon = await res.json();
-			console.log(dataCon);
 			$('#toggle').click()
 		// 	var json = `${data.result}`;
 		// 	var jsonArray = json.split("\r\n");

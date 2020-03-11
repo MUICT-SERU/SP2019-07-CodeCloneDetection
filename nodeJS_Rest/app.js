@@ -10,7 +10,7 @@ const config = require('./config/config.js')
 const fs = require('fs');
 const app = express()
 const cookieParser = require("cookie-parser");
-
+var Git = require('nodegit')
 app.use(cookieParser())
 app.use(bodyParser.json({ type: 'application/json' }))
 
@@ -60,30 +60,15 @@ app.post('/api/clone', function(req, res) {
   ];
 
   const child = require("child_process").spawnSync("git", args);
-console.log(`${child.stderr}`);
-      // console.error(`stderr: ${stderr}`);
-    execSync('java -jar simian-2.5.10.jar -reportDuplicateText ./temp/**.java > .\\output.txt | type .\\output.txt', (error, stdout, stderr) => {
-      if (error) {
-          console.error(`exec error: ${error}`);
-        }
-        console.log(`stdout: ${stdout}`);
-        // console.error(`stderr: ${stderr}`);
-        // console.log(objCheck);
-      })
-      execSync('rmdir /s /q .\\temp', (error, stdout, stderr) => {
-        if (error) {
-            console.error(`exec error: ${error}`);
-          }
-          console.log('successfully remove temp folder');
-          // console.error(`stderr: ${stderr}`);
-          // console.log(objCheck);
-        })
+console.log("clone");
+    execSync('java -jar simian-2.5.10.jar -reportDuplicateText ./temp/**.java > .\\output.txt | type .\\output.txt')
+      execSync('rmdir /s /q .\\temp')
         var user = `${req.body.user}`;
         var repoName = `${req.body.reposName}`;
         let time = moment().format('MMMM Do YYYY, H:mm:ss');
         let data = fs.readFileSync('./output.txt','utf8');
         let obj = {owner: user, repoName: repoName, result: data, date: time};
-
+    res.json(obj);
         MongoClient.connect(dburl, {
         useUnifiedTopology: true,
         useNewUrlParser: true,
@@ -96,9 +81,8 @@ console.log(`${child.stderr}`);
               db.close();
         });
         });
-        res.json(obj);
-})
 
+})
 
 app.post('/api/guestclone', function(req, res) {
 
