@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 public class CCLearner_Test {
 
-    public static String config_file = "/home/cclearner/Desktop/CCLearner/CCLearner.conf";
+    public static String config_file = "/Users/merry/Desktop/DoNotCopy/CCLearner-master/CCLearner.conf";
 
     public static String source_file_path;
     public static String clone_file_path;

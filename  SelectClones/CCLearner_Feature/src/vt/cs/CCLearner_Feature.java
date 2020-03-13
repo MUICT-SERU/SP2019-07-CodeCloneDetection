@@ -133,36 +133,45 @@ public class CCLearner_Feature {
 
             int count = 0;
 
-            true_writer.append("Filepath1, Filename1, Startline1, Endline1, Type1, Filepath2, Filename2, Startline2, Endline2, Type2, Clonetype, Similarity");
+//            true_writer.append("Filepath1, Filename1, Startline1, Endline1, Type1, Filepath2, Filename2, Startline2, Endline2, Type2, Clonetype, Similarity");
 
             while (res.next()) {
-                true_writer.append("\n");
                 String[] row = new String[rsmd.getColumnCount()];
 
                 for (int index = 0; index < rsmd.getColumnCount(); index++) {
                     row[index] = String.valueOf(res.getObject(index + 1));
-                    if(index == rsmd.getColumnCount()-1){
-                        true_writer.append(row[index]);
-                    }
-                    else{
-                        true_writer.append(row[index] + ",");
-                    }
+//                    if(index == rsmd.getColumnCount()-1){
+//                        true_writer.append(row[index]);
+//                    }
+//                    else{
+//                        true_writer.append(row[index] + ",");
+//                    }
                 }
 
-//                methodVectorList1.clear();
-//                methodVectorList2.clear();
+                methodVectorList1.clear();
+                methodVectorList2.clear();
 
-//                train_CloneFile1 = source_file_path + row[8] + "/" + row[0] + "/" + row[1];
-//                train_startline1 = Integer.valueOf(row[2]);
-//                train_endline1 = Integer.valueOf(row[3]);
-//
-//                train_CloneFile2 = source_file_path + row[8] + "/" + row[4] + "/" + row[5];
-//                train_startline2 = Integer.valueOf(row[6]);
-//                train_endline2 = Integer.valueOf(row[7]);
+                train_CloneFile1 = source_file_path + "4" + "/" + row[4] + "/" + row[1];
+                train_startline1 = Integer.valueOf(row[2]);
+                train_endline1 = Integer.valueOf(row[3]);
 
-//                if (Integer.valueOf(row[3]) - Integer.valueOf(row[2]) + 1 >= feature_minline &&
-//                    Integer.valueOf(row[7]) - Integer.valueOf(row[6]) + 1 >= feature_minline) {
-//
+                train_CloneFile2 = source_file_path + "4" + "/" + row[9] + "/" + row[6];
+                train_startline2 = Integer.valueOf(row[7]);
+                train_endline2 = Integer.valueOf(row[8]);
+
+                if (Integer.valueOf(row[3]) - Integer.valueOf(row[2]) + 1 >= feature_minline &&
+                    Integer.valueOf(row[8]) - Integer.valueOf(row[7]) + 1 >= feature_minline) {
+
+                            for (int index = 0; index < rsmd.getColumnCount(); index++) {
+                            row[index] = String.valueOf(res.getObject(index + 1));
+                                  if(index == rsmd.getColumnCount()-1){
+                                         true_writer.append(row[index]);
+                                     }
+                                     else{
+                                          true_writer.append(row[index] + ",");
+                                     }
+                    }
+                    true_writer.append("\n");
 //                    methodVectorList1 = parserTool1.parseMethod(train_CloneFile1);
 //                    methodVectorList2 = parserTool2.parseMethod(train_CloneFile2);
 
@@ -170,7 +179,7 @@ public class CCLearner_Feature {
 //                    Generate_FalseClones();
 
                     count++;
-//                }
+                }
             }
 
             System.out.println("Extracting True Clone Pairs -"  + True_Negative_Type[i] + "\t: " + count + "/" + count);
@@ -204,7 +213,7 @@ public class CCLearner_Feature {
         rsmdFalse = resFalse.getMetaData();
 
         false_writer = new PrintWriter(output_dir+ String.valueOf("FalseClones") + ".csv", "UTF-8");
-        false_writer.append("Filepath1, Filename1, Startline1, Endline1, Type1, Filepath2, Filename2, Startline2, Endline2, Type2, Clonetype, Similarity");
+//        false_writer.append("Filepath1, Filename1, Startline1, Endline1, Type1, Filepath2, Filename2, Startline2, Endline2, Type2, Clonetype, Similarity");
 
         ArrayList<String> falseClonesList = new ArrayList<>();
         String falseClone = "";
@@ -235,48 +244,48 @@ public class CCLearner_Feature {
         false_writer.close();
         System.out.println("Extracting False Clone Pairs COMPLETE");
 
-//        MergeFiles();
+        MergeFiles();
 //        System.out.println("COMPLETE!!");
 //        long end = System.nanoTime();
 //        System.out.println("Time Cost:\t" + TimeUnit.NANOSECONDS.toMillis(end - start) + "ms");
     }
 
-//	public static void Generate_TrueClones() {
-//
-//		// Locate each method in source files
-//		int rec_i = 0, rec_j = 0;
-//
-//		int dis1 = 999999, dis2 = 999999;
-//
-//		for(int i = 0; i < methodVectorList1.size(); i++) {
-//			int dis = Math.abs(methodVectorList1.getMethodVector(i).startLineNumber - train_startline1) +
-//					Math.abs(methodVectorList1.getMethodVector(i).endLineNumber - train_endline1);
-//			if(dis < dis1) {
-//				dis1 = dis;
-//				rec_i = i;
-//			}
-//		}
-//		for(int j = 0; j < methodVectorList2.size(); j++) {
-//			int dis = Math.abs(methodVectorList2.getMethodVector(j).startLineNumber - train_startline2) +
-//					Math.abs(methodVectorList2.getMethodVector(j).endLineNumber - train_endline2);
-//			if(dis < dis2) {
-//				dis2 = dis;
-//				rec_j = j;
-//			}
-//		}
+	public static void Generate_TrueClones() {
 
-//		// Output similarity vector of true clones
-//		MethodSimilarity methodSim = new MethodSimilarity();
-//
-//		if(feature_num == 8) {
-//            double[] sim = methodSim.methodVectorSim(methodVectorList1.getMethodVector(rec_i), methodVectorList2.getMethodVector(rec_j));
-////            Write_TrueClones(sim);
-//        }
-//		else if (feature_num == 7) {
-//            double[] sim = methodSim.methodVectorSim(methodVectorList1.getMethodVector(rec_i), methodVectorList2.getMethodVector(rec_j), feature_name);
-////            Write_TrueClones(sim);
-//        }
-//	}
+		// Locate each method in source files
+		int rec_i = 0, rec_j = 0;
+
+		int dis1 = 999999, dis2 = 999999;
+
+		for(int i = 0; i < methodVectorList1.size(); i++) {
+			int dis = Math.abs(methodVectorList1.getMethodVector(i).startLineNumber - train_startline1) +
+					Math.abs(methodVectorList1.getMethodVector(i).endLineNumber - train_endline1);
+			if(dis < dis1) {
+				dis1 = dis;
+				rec_i = i;
+			}
+		}
+		for(int j = 0; j < methodVectorList2.size(); j++) {
+			int dis = Math.abs(methodVectorList2.getMethodVector(j).startLineNumber - train_startline2) +
+					Math.abs(methodVectorList2.getMethodVector(j).endLineNumber - train_endline2);
+			if(dis < dis2) {
+				dis2 = dis;
+				rec_j = j;
+			}
+		}
+
+		// Output similarity vector of true clones
+		MethodSimilarity methodSim = new MethodSimilarity();
+
+		if(feature_num == 8) {
+            double[] sim = methodSim.methodVectorSim(methodVectorList1.getMethodVector(rec_i), methodVectorList2.getMethodVector(rec_j));
+//            Write_TrueClones(sim);
+        }
+		else if (feature_num == 7) {
+            double[] sim = methodSim.methodVectorSim(methodVectorList1.getMethodVector(rec_i), methodVectorList2.getMethodVector(rec_j), feature_name);
+//            Write_TrueClones(sim);
+        }
+	}
 
 //	public static void Write_TrueClones(double[] sim) {
 //        true_writer.print("1");
@@ -287,105 +296,105 @@ public class CCLearner_Feature {
 //    }
 //
 
-//    public static void Generate_FalseClones(int pos) {
-//
-//        // Locate each method in source files
-//        int rec_i = 0, rec_j = 0;
-//
-//        int dis1 = 999999, dis2 = 999999;
-//
-//        for(int i = 0; i < methodVectorList1.size(); i++) {
-//            int dis = Math.abs(methodVectorList1.getMethodVector(i).startLineNumber - train_startline1) +
-//                Math.abs(methodVectorList1.getMethodVector(i).endLineNumber - train_endline1);
-//            if(dis < dis1) {
-//                dis1 = dis;
-//                rec_i = i;
-//            }
-//        }
-//        for(int j = 0; j < methodVectorList2.size(); j++) {
-//            int dis = Math.abs(methodVectorList2.getMethodVector(j).startLineNumber - train_startline2) +
-//                Math.abs(methodVectorList2.getMethodVector(j).endLineNumber - train_endline2);
-//            if(dis < dis2) {
-//                dis2 = dis;
-//                rec_j = j;
-//            }
-//        }
-//
-//        for(int i = 0; i < methodVectorList1.size(); i++) {
-//            for(int j = 0; j < methodVectorList2.size(); j++){
-//                if(i != rec_i && j != rec_j) {
-//
-//                    MethodSimilarity methodSim = new MethodSimilarity();
-//
-//                    if(feature_num == 8) {
-//                        double[] sim = methodSim.methodVectorSim(methodVectorList1.getMethodVector(i), methodVectorList2.getMethodVector(j));
-//                        double methodSimilarity = sim[0] * 0.125 + sim[1] * 0.125 + sim[2] * 0.125 + sim[3] * 0.125 + sim[4] * 0.125 + sim[5] * 0.125 + sim[6] * 0.125 + sim[7] * 0.125;
-//                        Random rand = new Random();
-//                        int r_number = rand.nextInt(10) + 1;
-//                        if (True_Negative_Count < True_Negative_Threshold[pos] && methodSimilarity <= 0.2 && r_number <= 5) {
-//                            false_writer.print("0");
-//                            for (int index = 0; index < sim.length; index++)
-//                                false_writer.print("," + sim[index]);
-//                            false_writer.println();
-//                            false_writer.flush();
-//
-//                            True_Negative_Count++;
-//                        }
-//                    }
-//                    else if(feature_num == 7) {
-//                        double[] sim = methodSim.methodVectorSim(methodVectorList1.getMethodVector(i), methodVectorList2.getMethodVector(j), feature_name);
-//                        double methodSimilarity = sim[0] * 0.14 + sim[1] * 0.14 + sim[2] * 0.14 + sim[3] * 0.14 + sim[4] * 0.14 + sim[5] * 0.15 + sim[6] * 0.15;
-//                        Random rand = new Random();
-//                        int r_number = rand.nextInt(10) + 1;
-//                        if(True_Negative_Count < True_Negative_Threshold[pos] && methodSimilarity <= 0.2 && r_number <= 5) {
-//                            false_writer.print("0");
-//                            for(int index = 0; index < sim.length; index++)
-//                                false_writer.print("," + sim[index]);
-//                            false_writer.println();
-//                            false_writer.flush();
-//
-//                            True_Negative_Count++;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
+    public static void Generate_FalseClones(int pos) {
 
-//    public static void MergeFiles() throws Exception {
-//
-//        String line;
-//
-//        FileWriter writer = new FileWriter(feature_file_path);
-//
-//        System.out.println("Merging Training Files...");
-//
-//        for(int i = 0; i < 4 ; i++) {
-//            BufferedReader br = new BufferedReader(new FileReader(output_dir + String.valueOf(i+1) + ".csv"));
-//            while ((line = br.readLine()) != null) {
-//                writer.write(line + "\n");
-//                writer.flush();
-//            }
+        // Locate each method in source files
+        int rec_i = 0, rec_j = 0;
+
+        int dis1 = 999999, dis2 = 999999;
+
+        for(int i = 0; i < methodVectorList1.size(); i++) {
+            int dis = Math.abs(methodVectorList1.getMethodVector(i).startLineNumber - train_startline1) +
+                Math.abs(methodVectorList1.getMethodVector(i).endLineNumber - train_endline1);
+            if(dis < dis1) {
+                dis1 = dis;
+                rec_i = i;
+            }
+        }
+        for(int j = 0; j < methodVectorList2.size(); j++) {
+            int dis = Math.abs(methodVectorList2.getMethodVector(j).startLineNumber - train_startline2) +
+                Math.abs(methodVectorList2.getMethodVector(j).endLineNumber - train_endline2);
+            if(dis < dis2) {
+                dis2 = dis;
+                rec_j = j;
+            }
+        }
+
+        for(int i = 0; i < methodVectorList1.size(); i++) {
+            for(int j = 0; j < methodVectorList2.size(); j++){
+                if(i != rec_i && j != rec_j) {
+
+                    MethodSimilarity methodSim = new MethodSimilarity();
+
+                    if(feature_num == 8) {
+                        double[] sim = methodSim.methodVectorSim(methodVectorList1.getMethodVector(i), methodVectorList2.getMethodVector(j));
+                        double methodSimilarity = sim[0] * 0.125 + sim[1] * 0.125 + sim[2] * 0.125 + sim[3] * 0.125 + sim[4] * 0.125 + sim[5] * 0.125 + sim[6] * 0.125 + sim[7] * 0.125;
+                        Random rand = new Random();
+                        int r_number = rand.nextInt(10) + 1;
+                        if (True_Negative_Count < True_Negative_Threshold[pos] && methodSimilarity <= 0.2 && r_number <= 5) {
+                            false_writer.print("0");
+                            for (int index = 0; index < sim.length; index++)
+                                false_writer.print("," + sim[index]);
+                            false_writer.println();
+                            false_writer.flush();
+
+                            True_Negative_Count++;
+                        }
+                    }
+                    else if(feature_num == 7) {
+                        double[] sim = methodSim.methodVectorSim(methodVectorList1.getMethodVector(i), methodVectorList2.getMethodVector(j), feature_name);
+                        double methodSimilarity = sim[0] * 0.14 + sim[1] * 0.14 + sim[2] * 0.14 + sim[3] * 0.14 + sim[4] * 0.14 + sim[5] * 0.15 + sim[6] * 0.15;
+                        Random rand = new Random();
+                        int r_number = rand.nextInt(10) + 1;
+                        if(True_Negative_Count < True_Negative_Threshold[pos] && methodSimilarity <= 0.2 && r_number <= 5) {
+                            false_writer.print("0");
+                            for(int index = 0; index < sim.length; index++)
+                                false_writer.print("," + sim[index]);
+                            false_writer.println();
+                            false_writer.flush();
+
+                            True_Negative_Count++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public static void MergeFiles() throws Exception {
+
+        String line;
+
+        FileWriter writer = new FileWriter(feature_file_path);
+
+        System.out.println("Merging Training Files...");
+
+        for(int i = 0; i < 4 ; i++) {
+            BufferedReader br = new BufferedReader(new FileReader(output_dir + String.valueOf(i+1) + ".csv"));
+            while ((line = br.readLine()) != null) {
+                writer.write(line + "\n");
+                writer.flush();
+            }
 //            br = new BufferedReader(new FileReader(output_dir + "N" + String.valueOf(i+1) + ".csv"));
 //            while ((line = br.readLine()) != null) {
 //                writer.write(line + "\n");
 //                writer.flush();
 //            }
-//        }
-//        writer.close();
-//
-//        System.out.println("Deleting Old Files...");
-//
-//        try {
-//            for (int i = 0; i < 4; i++) {
-//                File file = new File(output_dir + String.valueOf(i+1) + ".csv");
-//                file.delete();
+        }
+        writer.close();
+
+        System.out.println("Deleting Old Files...");
+
+        try {
+            for (int i = 0; i < 4; i++) {
+                File file = new File(output_dir + String.valueOf(i+1) + ".csv");
+                file.delete();
 //                file = new File(output_dir + "N" + String.valueOf(i+1) + ".csv");
 //                file.delete();
-//            }
-//        }
-//        catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//   }
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+   }
 }
