@@ -8,7 +8,7 @@ public class CommandLineArgument {
     private String execID = "";
     private String DBUrl;
     private int DBPort;
-    private String outputSource;
+    private String outputSource ="result/clonesResult.csv";
     private String c2vPath;
 
     public CommandLineArgument(String[] args){
