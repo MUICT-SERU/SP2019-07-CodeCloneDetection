@@ -30,14 +30,10 @@ public class MerryEngine {
             methodHashMap.putAll(new JavaMethodParser(f).parseMethod());
         }
         System.out.println("Done creating Hashmap");
-//        int id=1;
         //write each method to .java file for code2vec in folder
 //        System.out.println("Start writing files");
 //        for (Map.Entry<String, Method> entry : methodHashMap.entrySet()) {
 //            Method m = entry.getValue();
-////            m.setId(id);
-////            id++;
-////            methodList.add(m);
 //            m.writeFile();
 //        }
 //        System.out.println("Done Write files");
@@ -347,18 +343,18 @@ public class MerryEngine {
             WekaTraining.main(wekaArgs);
         } else {
             String[] predictArgs = {};
-//            Weka.main(predictArgs);
+            Weka.main(predictArgs);
             String prediction;
             String result = "method1FileName,method1Start,Method1End,method1SourceCode,method2FileName,method2Start,Method2End,method2SourceCode";
-            MongoClient mongoClient = new MongoClient("localhost", 27018);
-            DB database = mongoClient.getDB("Result");
+//            MongoClient mongoClient = new MongoClient("localhost", 27018);
+//            DB database = mongoClient.getDB("Result");
 //            database.getCollectionNames().forEach(System.out::println);
-            DBCollection collection = database.getCollection("Result");
-            BasicDBObject document;
-            BufferedReader modelResultReader = new BufferedReader(new FileReader("result/result1.csv"));
+//            DBCollection collection = database.getCollection("Result");
+//            BasicDBObject document;
+            BufferedReader modelResultReader = new BufferedReader(new FileReader("result/resultCheck.csv"));
             while ((prediction = modelResultReader.readLine()) != null) {
                 String[] data = prediction.split(",");
-                if (data[data.length - 1].equalsIgnoreCase("true")) {
+                if (data[data.length - 2].equalsIgnoreCase("true")&& data[data.length - 1].equalsIgnoreCase("true")) {
                     int id = Integer.parseInt(data[0]);
                     if (id == methodPairList.get(id).getId()) {
                         Method m1 = methodPairList.get(id).getMethod1();
@@ -366,21 +362,21 @@ public class MerryEngine {
 //                        result += "\n"+m1.getFileName()+","+m1.getStartLine()+","+m1.getEndLine()+","+m1.getSourceCode()+","+m2.getFileName()+","+m2.getStartLine()+","+m2.getEndLine()+","+m2.getSourceCode();
                         result += "\n" + m1.getFilePath() + "," + m1.getStartLine() + "," + m1.getEndLine() + "," + "," + m2.getFilePath() + "," + m2.getStartLine() + "," + m2.getEndLine() + ",";
 
-                        document = new BasicDBObject();
-                        document.put("ExecutionID",cmd.getExecID());
-                        document.put("File1Path",m1.getFilePath());
-                        document.put("startLine1",m1.getStartLine());
-                        document.put("endLine1",m1.getEndLine());
-                        document.put("sourceCode1",m1.getSourceCode());
-                        document.put("File2Path",m2.getFilePath());
-                        document.put("startLine2",m2.getStartLine());
-                        document.put("endLine2",m2.getEndLine());
-                        document.put("sourceCode2",m2.getSourceCode());
-                        collection.insert(document);
+//                        document = new BasicDBObject();
+//                        document.put("ExecutionID",cmd.getExecID());
+//                        document.put("File1Path",m1.getFilePath());
+//                        document.put("startLine1",m1.getStartLine());
+//                        document.put("endLine1",m1.getEndLine());
+//                        document.put("sourceCode1",m1.getSourceCode());
+//                        document.put("File2Path",m2.getFilePath());
+//                        document.put("startLine2",m2.getStartLine());
+//                        document.put("endLine2",m2.getEndLine());
+//                        document.put("sourceCode2",m2.getSourceCode());
+//                        collection.insert(document);
                     }
                 }
             }
-            FileWriter cloneWriter = new FileWriter("result/clonesResult.csv");
+            FileWriter cloneWriter = new FileWriter("result/clonesResultT P.csv");
             cloneWriter.write(result);
             cloneWriter.flush();
             cloneWriter.close();

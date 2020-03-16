@@ -3,6 +3,8 @@ import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.Evaluation;
 
 import weka.classifiers.trees.REPTree;
+import weka.classifiers.trees.RandomForest;
+import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.CSVSaver;
 import weka.core.converters.ConverterUtils;
@@ -17,27 +19,28 @@ import java.io.IOException;
 
 public class WekaTraining {
     public static void main(String[] args) throws Exception {
-        //read csv file as a data set
         CommandLineArgument wekaConfig = new CommandLineArgument(args);
+        //read csv file as a data set
         ConverterUtils.DataSource source = new ConverterUtils.DataSource("assets/trainModelMetrics.csv");
         Instances dataSet = source.getDataSet();
 
         //Split data to 80% of train and 20% of test datasets
-        dataSet.randomize(new java.util.Random(1));
+        dataSet.randomize(new java.util.Random(0));
         int trainSize = (int) Math.round(dataSet.numInstances() * 0.7);
         int validSize = (int) Math.round(dataSet.numInstances() * 0.1);
         int testSize = dataSet.numInstances() - (trainSize + validSize);
         Instances train = new Instances(dataSet, 0, trainSize);
         Instances valid = new Instances(dataSet, trainSize,validSize);
         Instances test = new Instances(dataSet, trainSize+validSize, testSize);
+        System.out.println("Train size should be"+trainSize+"Instances train size is "+train.numInstances()+ " from data size "+ dataSet.numInstances());
 
         //save split instances to csv
         saveCsv(train,"assets/trainDataSet.csv");
         saveCsv(valid,"assets/validDataSet.csv");
         saveCsv(test,"assets/testDataSet.csv");
 
-        ConverterUtils.DataSource trainData = new ConverterUtils.DataSource("assets/trainDataSet.csv");
-        train = trainData.getDataSet();
+//        ConverterUtils.DataSource trainData = new ConverterUtils.DataSource("assets/trainDataSet.csv");
+//        train = trainData.getDataSet();
         ConverterUtils.DataSource validData = new ConverterUtils.DataSource("assets/validDataSet.csv");
         valid = validData.getDataSet();
         ConverterUtils.DataSource testData = new ConverterUtils.DataSource("assets/testDataSet.csv");
@@ -58,23 +61,36 @@ public class WekaTraining {
         valid.setClassIndex(valid.numAttributes()-1);
         test.setClassIndex(test.numAttributes()-1);
 
+//        //Decision Tree
         //set classifier option
-        int treeDepth = 6;//wekaConfig.getTreeDepth();
+        int treeDepth = 5;//wekaConfig.getTreeDepth();
         String[] options = new String[2];
         options[0] = "-L"; options[1] = treeDepth+"";
 
         //Build the classifier
-        REPTree tree = new REPTree();
-        tree.setOptions(options);
-        tree.buildClassifier(train);
+        REPTree model = new REPTree();
+        model.setOptions(options);
+        model.buildClassifier(train);
+
+        //Random forest
+        //set classifier option
+//        int treeDepth = 5;//wekaConfig.getTreeDepth();
+//        String[] options = new String[2];
+//        options[0] = "-depth"; options[1] = treeDepth+"";
+//
+//        //Build the classifier
+//        RandomForest model = new RandomForest();
+//        model.setOptions(options);
+//        model.buildClassifier(train);
+
 
         //saving model
-        weka.core.SerializationHelper.write("models/tree"+treeDepth+"_model.model",tree);
+        weka.core.SerializationHelper.write("models/randomForest"+treeDepth+"_model.model",model);
         //create model evaluation
         Evaluation eval = new Evaluation(train);
 
         //validate model
-        eval.evaluateModel(tree,valid);
+        eval.evaluateModel(model,valid);
 
         System.out.println("Evaluation Result on Validate Data set:");
         System.out.println("Correct % : "+ eval.pctCorrect());
@@ -99,7 +115,7 @@ public class WekaTraining {
 
         //evaluate model
         Evaluation eval2 = new Evaluation(train);
-        eval2.evaluateModel(tree,test);
+        eval2.evaluateModel(model,test);
         System.out.println("\n////////////////////////////////////\n");
         System.out.println("Evaluation Result on Test Data set:");
         System.out.println("Correct % : "+ eval2.pctCorrect());
@@ -122,13 +138,13 @@ public class WekaTraining {
         System.out.println("FP : "+ eval2.weightedFalsePositiveRate());
         System.out.println("FN : "+ eval2.weightedFalseNegativeRate());
 
-        // display classifier
+//        // display classifier
         final javax.swing.JFrame jf =
                 new javax.swing.JFrame("Weka Classifier Tree Visualizer");
         jf.setSize(1500,800);
         jf.getContentPane().setLayout(new BorderLayout());
         TreeVisualizer tv = new TreeVisualizer(null,
-                (tree).graph(),
+                (model).graph(),
                 new PlaceNode2());
         jf.getContentPane().add(tv, BorderLayout.CENTER);
         jf.addWindowListener(new java.awt.event.WindowAdapter() {
