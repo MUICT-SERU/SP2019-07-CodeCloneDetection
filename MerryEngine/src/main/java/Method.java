@@ -88,9 +88,9 @@ public class Method {
          this.uniqueOperatorNo = operatorSet.size();
     }
 
-    public void writeFile(){
+    public void writeFile(String path){
         try {
-            FileWriter myWriter = new FileWriter("JavaMethods/"+id+".java");
+            FileWriter myWriter = new FileWriter(path+"/"+id+".java");
             myWriter.write(this.sourceCode);
             myWriter.close();
 //            System.out.println("Successfully wrote to the file.");

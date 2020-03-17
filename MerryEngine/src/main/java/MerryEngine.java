@@ -34,7 +34,7 @@ public class MerryEngine {
         System.out.println("Start writing files");
         for (Map.Entry<String, Method> entry : methodHashMap.entrySet()) {
             Method m = entry.getValue();
-            m.writeFile();
+            m.writeFile("JavaMethods");
         }
         System.out.println("Done Write files");
         boolean readVector = false;
