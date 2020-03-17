@@ -1,5 +1,6 @@
 import weka.classifiers.Evaluation;
 import weka.classifiers.trees.REPTree;
+import weka.classifiers.trees.RandomForest;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.CSVSaver;
@@ -12,11 +13,11 @@ import java.io.File;
 public class Weka{
     public static void main(String[] arg) throws Exception {
         //Load model
-        String modelName = "models/tree8_model.model";
-        REPTree treeModel = (REPTree) weka.core.SerializationHelper.read(modelName);
+        String modelName = "models/randomForest5_model.model";
+        RandomForest treeModel = (RandomForest) weka.core.SerializationHelper.read(modelName);
 
         //Load data set
-        ConverterUtils.DataSource source = new ConverterUtils.DataSource("assets/testDataSet2.csv");
+        ConverterUtils.DataSource source = new ConverterUtils.DataSource("assets/testDataSet.csv");
         Instances dataSet = source.getDataSet();
         String[] removeOpts = new String[2];
         removeOpts[0] = "-R"; removeOpts[1] = "1";
@@ -36,7 +37,7 @@ public class Weka{
         }
         CSVSaver saver = new CSVSaver();
         saver.setInstances(dataSet);
-        saver.setFile(new File("result/result1.csv"));
+        saver.setFile(new File("result/result.csv"));
         saver.writeBatch();
     }
 }

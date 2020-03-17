@@ -30,54 +30,50 @@ public class MerryEngine {
             methodHashMap.putAll(new JavaMethodParser(f).parseMethod());
         }
         System.out.println("Done creating Hashmap");
-//        int id=1;
         //write each method to .java file for code2vec in folder
-//        System.out.println("Start writing files");
-//        for (Map.Entry<String, Method> entry : methodHashMap.entrySet()) {
-//            Method m = entry.getValue();
-////            m.setId(id);
-////            id++;
-////            methodList.add(m);
-//            m.writeFile();
-//        }
-//        System.out.println("Done Write files");
-//        boolean readVector = false;
-//        String s = null;
-//        try {
-//
-//            // run the Unix "ps -ef" command
-//            // using the Runtime exec method:/
-//            Process p = Runtime.getRuntime().exec("python3 code2vec/code2vec.py --load code2vec/models/java14_model/saved_model_iter8.release --predict --export_code_vectors");
-//
-//            BufferedReader stdInput = new BufferedReader(new
-//                    InputStreamReader(p.getInputStream()));
-//
-//            BufferedReader stdError = new BufferedReader(new
-//                    InputStreamReader(p.getErrorStream()));
-//
-//            // read the output from the command
-//            System.out.println("Here is the standard output of the command:\n");
-//            while ((s = stdInput.readLine()) != null) {
-//                System.out.println(s);
-//
-//                if(s.contains("Code vector")){
-//                    readVector = true;
-//                }
-//            }
-//
-//            // read any errors from the attempted command
-//            System.out.println("Here is the standard error of the command (if any):\n");
-//            while ((s = stdError.readLine()) != null) {
-//                System.out.println(s);
-//            }
-//
-//        }
-//        catch (IOException e) {
-//            System.out.println("exception happened - here's what I know: ");
-//            e.printStackTrace();
-//            System.exit(-1);
-//        }
-//        System.out.println("Done get vector from code2vec");
+        System.out.println("Start writing files");
+        for (Map.Entry<String, Method> entry : methodHashMap.entrySet()) {
+            Method m = entry.getValue();
+            m.writeFile();
+        }
+        System.out.println("Done Write files");
+        boolean readVector = false;
+        String s = null;
+        try {
+
+            // run the Unix "ps -ef" command
+            // using the Runtime exec method:/
+            Process p = Runtime.getRuntime().exec("python3 "+ cmd.getC2vPath()+ "/code2vec.py --load "+cmd.getC2vPath()+"/models/java14_model/saved_model_iter8.release --predict --export_code_vectors");
+
+            BufferedReader stdInput = new BufferedReader(new
+                    InputStreamReader(p.getInputStream()));
+
+            BufferedReader stdError = new BufferedReader(new
+                    InputStreamReader(p.getErrorStream()));
+
+            // read the output from the command
+            System.out.println("Here is the standard output of the command:\n");
+            while ((s = stdInput.readLine()) != null) {
+                System.out.println(s);
+
+                if(s.contains("Code vector")){
+                    readVector = true;
+                }
+            }
+
+            // read any errors from the attempted command
+            System.out.println("Here is the standard error of the command (if any):\n");
+            while ((s = stdError.readLine()) != null) {
+                System.out.println(s);
+            }
+
+        }
+        catch (IOException e) {
+            System.out.println("exception happened - here's what I know: ");
+            e.printStackTrace();
+            System.exit(-1);
+        }
+        System.out.println("Done get vector from code2vec");
         HashMap<String,String> originalFileNameHashMap = new HashMap<>();
         if (cmd.isTraining()) {
             HashMap<String, Method> selectedMethodHashMap = new HashMap<>();
@@ -347,18 +343,18 @@ public class MerryEngine {
             WekaTraining.main(wekaArgs);
         } else {
             String[] predictArgs = {};
-//            Weka.main(predictArgs);
+            Weka.main(predictArgs);
             String prediction;
             String result = "method1FileName,method1Start,Method1End,method1SourceCode,method2FileName,method2Start,Method2End,method2SourceCode";
-            MongoClient mongoClient = new MongoClient("localhost", 27018);
+            MongoClient mongoClient = new MongoClient(cmd.getDBUrl(), cmd.getDBPort());
             DB database = mongoClient.getDB("Result");
-//            database.getCollectionNames().forEach(System.out::println);
+            database.getCollectionNames().forEach(System.out::println);
             DBCollection collection = database.getCollection("Result");
             BasicDBObject document;
-            BufferedReader modelResultReader = new BufferedReader(new FileReader("result/result1.csv"));
+            BufferedReader modelResultReader = new BufferedReader(new FileReader("result/result.csv"));
             while ((prediction = modelResultReader.readLine()) != null) {
                 String[] data = prediction.split(",");
-                if (data[data.length - 1].equalsIgnoreCase("true")) {
+                if (data[data.length - 2].equalsIgnoreCase("true")&& data[data.length - 1].equalsIgnoreCase("true")) {
                     int id = Integer.parseInt(data[0]);
                     if (id == methodPairList.get(id).getId()) {
                         Method m1 = methodPairList.get(id).getMethod1();
@@ -380,7 +376,7 @@ public class MerryEngine {
                     }
                 }
             }
-            FileWriter cloneWriter = new FileWriter("result/clonesResult.csv");
+            FileWriter cloneWriter = new FileWriter(cmd.getOutputSource());
             cloneWriter.write(result);
             cloneWriter.flush();
             cloneWriter.close();

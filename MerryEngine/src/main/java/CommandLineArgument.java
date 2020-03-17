@@ -6,6 +6,10 @@ public class CommandLineArgument {
     private boolean training = false;
     private int treeDepth = 8;
     private String execID = "";
+    private String DBUrl;
+    private int DBPort;
+    private String outputSource ="result/clonesResult.csv";
+    private String c2vPath;
 
     public CommandLineArgument(String[] args){
         for(int i=0;i< args.length;i++) {
@@ -44,6 +48,18 @@ public class CommandLineArgument {
             if(args[i].equalsIgnoreCase("-execID" )){
                 this.execID = args[i+1];
             }
+            if(args[i].equalsIgnoreCase("-DBUrl")){
+                this.DBUrl = args[i+1];
+            }
+            if(args[i].equalsIgnoreCase("-Dbport")){
+                this.DBPort = Integer.parseInt(args[i+1]);
+            }
+            if(args[i].equalsIgnoreCase("-output")){
+                this.outputSource = args[i+1];
+            }
+            if(args[i].equalsIgnoreCase("-c2vPath")){
+                this.c2vPath = args[i+1];
+            }
         }
     }
 
@@ -73,5 +89,21 @@ public class CommandLineArgument {
 
     public String getExecID() {
         return execID;
+    }
+
+    public String getDBUrl() {
+        return DBUrl;
+    }
+
+    public int getDBPort() {
+        return DBPort;
+    }
+
+    public String getOutputSource() {
+        return outputSource;
+    }
+
+    public String getC2vPath() {
+        return c2vPath;
     }
 }
