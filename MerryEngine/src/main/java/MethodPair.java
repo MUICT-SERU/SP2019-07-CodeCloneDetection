@@ -20,6 +20,8 @@ public class MethodPair {
     private double[] code2VecSimilarityScore = new double[12];
     private boolean decision = Boolean.parseBoolean(null);
     private int id;
+    private boolean isSyntacticOn = true;
+    private boolean isSemanticOn = true;
 
     public MethodPair(int id,Method m1,Method m2){
         this.id = id;
@@ -29,20 +31,22 @@ public class MethodPair {
         computeCode2VecSimilarity();
     }
 
-    public MethodPair(int id,Method m1,Method m2, boolean dec){
-        this.id=id;
+    public MethodPair(int id,Method m1,Method m2,boolean isSyntacticOn,boolean isSemanticOn){
+        this.id = id;
         this.method1 = m1;
         this.method2 = m2;
-        this.decision = dec;
-        computeMetrics();
-        computeCode2VecSimilarity();
-
+        this.isSyntacticOn = isSyntacticOn;
+        this.isSemanticOn = isSemanticOn;
+        if(isSyntacticOn){
+            computeMetrics();
+        }
+        if(isSemanticOn){
+            computeCode2VecSimilarity();
+        }
     }
 
     private void computeMetrics(){
         NormalizedLevenshtein l = new NormalizedLevenshtein();
-//        JaroWinkler jw = new JaroWinkler();
-//        Jaccard j = new Jaccard();
         this.diffTokenNo = abs(this.method1.getTokenNo()-this.method2.getTokenNo());
         this.diffUniqueTokenNo = abs(this.method1.getUniqueTokenNo()-this.method2.getUniqueTokenNo());
         this.diffIdentifierNo = abs(this.method1.getIdentifierNo()-this.method2.getIdentifierNo());
@@ -114,6 +118,15 @@ public class MethodPair {
         diffCount += maxLength-minLength;
         double similarityScore = diffCount/maxLength;
         return similarityScore;
+    }
+    public String toString(){
+        String str = "";
+        if(isSyntacticOn){
+            str+= this.id+","+this.diffLOC+","+this.diffIdentifierNo+","+this.diffOperatorNo+","+this.diffTokenNo+","+
+                    this.diffTokenTypeDiversity+","+this.diffUniqueIdentifierNo+","+this.diffUniqueOperatorNo+","+this.diffUniqueTokenNo+
+                    ","+this.similarFileNameScore+","+this.similarMethodNameScore+","+this.isSameReturnType;
+        }
+        return str;
     }
 
     public Method getMethod1() {

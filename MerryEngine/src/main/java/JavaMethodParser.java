@@ -25,6 +25,7 @@ public class JavaMethodParser {
     public JavaMethodParser(String path){
         this.path = path;
         //fileName = path.split("/")[path.split("/").length-1].split(".")[0];
+        path = path.replace("\\","/");
         String[] s = path.split("/");
         String file = s[s.length-1];
         String[] fn = file.split("\\.");

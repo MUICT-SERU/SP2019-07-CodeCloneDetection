@@ -1,12 +1,13 @@
-
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
+import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.util.*;
 import java.sql.Timestamp;
+
 
 public class MerryEngine {
     public static void main(String[] args) throws Exception {
@@ -17,7 +18,15 @@ public class MerryEngine {
         System.out.println("Input : " + cmd.getInputSource());
         System.out.println("Size filter : " + cmd.isSizeFilter());
         System.out.println("code2vec Size : " + cmd.getCode2vecSize());
-        System.out.println("testing mode : " + cmd.isTraining());
+        System.out.println("training mode : " + cmd.isTraining());
+        System.out.println("working Directory : "+cmd.getWorkingDir());
+        System.out.println("Model : "+cmd.getModel());
+        System.out.println("Metrics : Syntactic "+cmd.isSyntactic()+" , Semantic "+cmd.isSemantic());
+//        FileUtils.cleanDirectory(new File(cmd.getWorkingDir()));
+        FileUtils.forceMkdir(new File(cmd.getWorkingDir() + "/assets"));
+        FileUtils.forceMkdir(new File(cmd.getWorkingDir() + "/JavaMethods"));
+        FileUtils.forceMkdir(new File(cmd.getWorkingDir() + "/models"));
+        FileUtils.forceMkdir(new File(cmd.getWorkingDir() + "/result"));
         boolean useSizeFilter = cmd.isSizeFilter();
         final File folder = new File(cmd.getInputSource());
         ArrayList<String> fileList = new ArrayList<String>();
@@ -30,20 +39,21 @@ public class MerryEngine {
             methodHashMap.putAll(new JavaMethodParser(f).parseMethod());
         }
         System.out.println("Done creating Hashmap");
-        //write each method to .java file for code2vec in folder
+//        write each method to .java file for code2vec in folder
+        FileUtils.cleanDirectory(new File(cmd.getWorkingDir()+"/JavaMethods"));
         System.out.println("Start writing files");
         for (Map.Entry<String, Method> entry : methodHashMap.entrySet()) {
             Method m = entry.getValue();
-            m.writeFile("JavaMethods");
+            m.writeFile(cmd.getWorkingDir()+"/JavaMethods");
         }
         System.out.println("Done Write files");
         boolean readVector = false;
+//        FileUtils.forceDelete(new File("assets/c2vVector.csv"));
         String s = null;
         try {
-
             // run the Unix "ps -ef" command
             // using the Runtime exec method:/
-            Process p = Runtime.getRuntime().exec("python3 "+ cmd.getC2vPath()+ "/code2vec.py --load "+cmd.getC2vPath()+"/models/java14_model/saved_model_iter8.release --predict --export_code_vectors");
+            Process p = Runtime.getRuntime().exec("python "+ cmd.getC2vPath()+ "/code2vec.py --load "+cmd.getC2vPath()+"/models/java14_model/saved_model_iter8.release --predict --export_code_vectors");
 
             BufferedReader stdInput = new BufferedReader(new
                     InputStreamReader(p.getInputStream()));
@@ -74,8 +84,9 @@ public class MerryEngine {
             System.exit(-1);
         }
         System.out.println("Done get vector from code2vec");
-        HashMap<String,String> originalFileNameHashMap = new HashMap<>();
+
         if (cmd.isTraining()) {
+            HashMap<String,String> originalFileNameHashMap = new HashMap<>();
             HashMap<String, Method> selectedMethodHashMap = new HashMap<>();
             BufferedReader csvFilterTrueReader = new BufferedReader(new FileReader("assets/TrueClones.csv"));
             String line;
@@ -115,30 +126,25 @@ public class MerryEngine {
             for (Map.Entry<String, Method> entry : methodHashMap.entrySet()) {
                 Method method = entry.getValue();
                 String filePathOrigin = originalFileNameHashMap.get(method.getFileName()+".java");
-//                System.out.println(filePathOrigin);
                 String[] path = filePathOrigin.split("/");
                 String fileNameOrigin = path[path.length-1].replace(".java","");
-//                System.out.println(fileNameOrigin);
                 method.setFileName(fileNameOrigin);
             }
         }
 
         int ch = 0;
-        BufferedReader csvReader = new BufferedReader(new FileReader("assets/c2vVector.csv"));
+        BufferedReader csvReader = new BufferedReader(new FileReader(cmd.getWorkingDir()+"/assets/c2vVector.csv"));
         String row;
         while ((row = csvReader.readLine()) != null) {
             ch++;
-//            if(ch %100 == 0){
-//                System.out.println("estimate current line : "+ch);
-//            }
             String[] data = row.split(",");
             String key = data[0].replace(".java", "");
             Method methodToAssign = methodHashMap.get(key);
-////            System.out.println(key+" --> key");
-            if (methodToAssign != null) {
+            try {
                 methodToAssign.setCode2vecVector(data[1].trim(), cmd.getCode2vecSize());
+            }catch (Exception e){
+//                System.out.println(e);
             }
-//            methodToAssign.setC2vVectorAsString(data[1].trim());
         }
         csvReader.close();
         System.out.println("Method hash size : " + methodHashMap.size());
@@ -155,7 +161,9 @@ public class MerryEngine {
                 Method m2 = methodHashMap.get(data[6].replace(".java", "") + data[7] + data[8]);
                 if (m1 != null && m2 != null) {
                     if (m1.isVectorSet() && m2.isVectorSet()) {
-                        methodPairList.add(new MethodPair(pairIDSetter, m1, m2, true));
+                        MethodPair newMethodPair = new MethodPair(pairIDSetter,m1,m2);
+                        newMethodPair.setDecision(true);
+                        methodPairList.add(newMethodPair);
                         pairIDSetter++;
                     }
                 }
@@ -169,16 +177,74 @@ public class MerryEngine {
                 Method m2 = methodHashMap.get(data[6].replace(".java", "") + data[7] + data[8]);
                 if (m1 != null && m2 != null) {
                     if (m1.isVectorSet() && m2.isVectorSet()) {
-                        methodPairList.add(new MethodPair(pairIDSetter, m1, m2, false));
+                        MethodPair newMethodPair = new MethodPair(pairIDSetter,m1,m2);
+                        newMethodPair.setDecision(false);
+                        methodPairList.add(newMethodPair);
                         pairIDSetter++;
                     }
                 }
             }
             csvTrainingFalseReader.close();
         } else {
+//            //this part is for select only test( ground truth pair)
+//            HashMap<String,String> originalFileNameHashMap = new HashMap<>();
+//            HashMap<String, Method> selectedMethodHashMap = new HashMap<>();
+//            BufferedReader csvTestingReader = new BufferedReader(new FileReader("/Users/sidekoiii/Desktop/testdataCSV/TestT1ToSt3Rand.csv"));
+//            String pair;
+//            while ((pair = csvTestingReader.readLine()) != null){
+//                String[] data = pair.split(",");
+//                originalFileNameHashMap.put(data[0],data[1]);
+//                Method m = methodHashMap.get(data[0].replace(".java", "") + data[2] + data[3]);
+//                if (m != null) {
+//                    selectedMethodHashMap.put(data[0].replace(".java", "") + data[2] + data[3], m);
+//                }
+//                originalFileNameHashMap.put(data[5],data[6]);
+//                m = methodHashMap.get(data[5].replace(".java", "") + data[7] + data[8]);
+//                if (m != null) {
+//                    selectedMethodHashMap.put(data[5].replace(".java", "") + data[7] + data[8], m);
+//                }
+//            }
+//            methodHashMap.clear();
+//            methodHashMap.putAll(selectedMethodHashMap);
+//            selectedMethodHashMap.clear();
+//            System.out.println("Method hash size after filter: " + methodHashMap.size());
+//            csvTestingReader.close();
+//            for (Map.Entry<String, Method> entry : methodHashMap.entrySet()) {
+//                Method method = entry.getValue();
+//                String filePathOrigin = originalFileNameHashMap.get(method.getFileName()+".java");
+//                String[] path = filePathOrigin.split("/");
+//                String fileNameOrigin = path[path.length-1].replace(".java","");
+//                method.setFileName(fileNameOrigin);
+//            }
+//            BufferedReader csvTestingPairingReader = new BufferedReader(new FileReader("/Users/sidekoiii/Desktop/testdataCSV/TestT1ToSt3Rand.csv"));
+//            int pairIDSetter = 0;
+//            int trueCounter = 0;
+//            while ((pair = csvTestingPairingReader.readLine()) != null) {
+//                String[] data = pair.split(",");
+//                Method m1 = methodHashMap.get(data[0].replace(".java", "") + data[2] + data[3]);
+//                Method m2 = methodHashMap.get(data[5].replace(".java", "") + data[7] + data[8]);
+////                if(Boolean.parseBoolean(data[data.length-1])==false||(Boolean.parseBoolean(data[data.length-1])==true&&Integer.parseInt(data[10])==3&&Double.parseDouble(data[11])>=0.7&&Double.parseDouble(data[11])<0.9)){
+//                    if (m1 != null && m2 != null) {
+//                        if (m1.isVectorSet() && m2.isVectorSet()) {
+//                            MethodPair newMethodPair = new MethodPair(pairIDSetter,m1,m2);
+//                            newMethodPair.setDecision(Boolean.parseBoolean(data[data.length-1]));
+//                            methodPairList.add(newMethodPair);
+//                            pairIDSetter++;
+//                            if(Boolean.parseBoolean(data[data.length-1])==true){
+//                                trueCounter++;
+//                            }
+//                        }
+//                    }
+////                }
+//            }
+//            System.out.println("number of true : "+ trueCounter);
+//            csvTestingPairingReader.close();
+//            end part is for select only test( ground truth pair)
+//            paring for normal detection
             for (Map.Entry<String, Method> entry : methodHashMap.entrySet()) {
                 methodList.add(entry.getValue());
             }
+//            System.out.println(methodList.size()+ "Sizeeee");
             int pairIDSetter = 0;
             for (int i = 0; i < methodList.size(); i++) {
                 for (int j = i + 1; j < methodList.size(); j++) {
@@ -189,22 +255,32 @@ public class MerryEngine {
                         int m2Tokens = methodList.get(j).getTokenNo();
                         double T = cmd.getSizeFilterThreshold();
                         if (m1Tokens * T <= m2Tokens && m2Tokens <= m1Tokens / T) {
+                            try{
+                                MethodPair methodPair = new MethodPair(pairIDSetter, methodList.get(i), methodList.get(j));
+                                methodPairList.add(methodPair);
+                                pairIDSetter++;
+                            }catch (Exception e){
+//                                System.out.println(e);
+                            }
+                        }
+                    } else {
+                        try{
                             MethodPair methodPair = new MethodPair(pairIDSetter, methodList.get(i), methodList.get(j));
                             methodPairList.add(methodPair);
                             pairIDSetter++;
+                        }catch (Exception e){
+//                                System.out.println(e);
                         }
-                    } else {
-                        MethodPair methodPair = new MethodPair(pairIDSetter, methodList.get(i), methodList.get(j));
-                        methodPairList.add(methodPair);
-                        pairIDSetter++;
+
                     }
                     //end size filter
                 }
             }
+
         }
         if (cmd.isTraining()) {
-            FileWriter csvWriter = new FileWriter("assets/trainModelMetrics.csv");
-            csvWriter.append("PairID");
+            FileWriter csvWriter = new FileWriter(cmd.getWorkingDir()+"/assets/trainModelMetrics.csv");
+            csvWriter.write("PairID");
             csvWriter.append(",");
             csvWriter.append("DiffLOC");
             csvWriter.append(",");
@@ -271,97 +347,115 @@ public class MerryEngine {
             csvWriter.flush();
             csvWriter.close();
         } else {
-            FileWriter csvWriter = new FileWriter("assets/metrics.csv");
-            csvWriter.append("PairID");
+            FileWriter csvWriter = new FileWriter(cmd.getWorkingDir()+"/assets/metrics.csv");
+            csvWriter.write("PairID");
             csvWriter.append(",");
-            csvWriter.append("DiffLOC");
-            csvWriter.append(",");
-            csvWriter.append("DiffIdentifierNo");
-            csvWriter.append(",");
-            csvWriter.append("DiffOperatorNo");
-            csvWriter.append(",");
-            csvWriter.append("DiffTokenNo");
-            csvWriter.append(",");
-            csvWriter.append("DiffTokenTypeDiversity");
-            csvWriter.append(",");
-            csvWriter.append("DiffUniqueIdentifierNo");
-            csvWriter.append(",");
-            csvWriter.append("DiffUniqueOperatorNo");
-            csvWriter.append(",");
-            csvWriter.append("DiffUniqueTokenNo");
-            csvWriter.append(",");
-            csvWriter.append("DiffFileNameScore");
-            csvWriter.append(",");
-            csvWriter.append("DiffMethodNameScore");
-            csvWriter.append(",");
-            csvWriter.append("IsSameReturnType");
-            csvWriter.append(",");
-            for (int j = 0; j < 11; j++) {
-                csvWriter.append("c2v_" + j);
+            if(cmd.isSyntactic()){
+                csvWriter.append("DiffLOC");
+                csvWriter.append(",");
+                csvWriter.append("DiffIdentifierNo");
+                csvWriter.append(",");
+                csvWriter.append("DiffOperatorNo");
+                csvWriter.append(",");
+                csvWriter.append("DiffTokenNo");
+                csvWriter.append(",");
+                csvWriter.append("DiffTokenTypeDiversity");
+                csvWriter.append(",");
+                csvWriter.append("DiffUniqueIdentifierNo");
+                csvWriter.append(",");
+                csvWriter.append("DiffUniqueOperatorNo");
+                csvWriter.append(",");
+                csvWriter.append("DiffUniqueTokenNo");
+                csvWriter.append(",");
+                csvWriter.append("DiffFileNameScore");
+                csvWriter.append(",");
+                csvWriter.append("DiffMethodNameScore");
+                csvWriter.append(",");
+                csvWriter.append("IsSameReturnType");
                 csvWriter.append(",");
             }
-            csvWriter.append("c2v_11,Decision");
+            if(cmd.isSemantic()){
+                for (int j = 0; j < 12; j++) {
+                    csvWriter.append("c2v_" + j);
+                    csvWriter.append(",");
+                }
+            }
+            csvWriter.append("Decision");
             for (int i = 0; i < methodPairList.size(); i++) {
                 MethodPair mp = methodPairList.get(i);
                 csvWriter.append("\n ");
                 csvWriter.append(mp.getId() + "");
                 csvWriter.append(",");
-                csvWriter.append(mp.getDiffLOC() + "");
-                csvWriter.append(",");
-                csvWriter.append(mp.getDiffIdentifierNo() + "");
-                csvWriter.append(",");
-                csvWriter.append(mp.getDiffOperatorNo() + "");
-                csvWriter.append(",");
-                csvWriter.append(mp.getDiffTokenNo() + "");
-                csvWriter.append(",");
-                csvWriter.append(mp.getDiffTokenTypeDiversity() + "");
-                csvWriter.append(",");
-                csvWriter.append(mp.getDiffUniqueIdentifierNo() + "");
-                csvWriter.append(",");
-                csvWriter.append(mp.getDiffUniqueOperatorNo() + "");
-                csvWriter.append(",");
-                csvWriter.append(mp.getDiffUniqueTokenNo() + "");
-                csvWriter.append(",");
-                csvWriter.append(mp.getSimilarFileNameScore() + "");
-                csvWriter.append(",");
-                csvWriter.append(mp.getSimilarMethodNameScore() + "");
-                csvWriter.append(",");
-                csvWriter.append(mp.isSameReturnType() + "");
-                csvWriter.append(",");
-                double[] c2v = mp.getCode2VecSimilarityScore();
-                for (int j = 0; j < 11; j++) {
-                    csvWriter.append(c2v[j] + "");
+                if(cmd.isSyntactic()){
+                    csvWriter.append(mp.getDiffLOC() + "");
+                    csvWriter.append(",");
+                    csvWriter.append(mp.getDiffIdentifierNo() + "");
+                    csvWriter.append(",");
+                    csvWriter.append(mp.getDiffOperatorNo() + "");
+                    csvWriter.append(",");
+                    csvWriter.append(mp.getDiffTokenNo() + "");
+                    csvWriter.append(",");
+                    csvWriter.append(mp.getDiffTokenTypeDiversity() + "");
+                    csvWriter.append(",");
+                    csvWriter.append(mp.getDiffUniqueIdentifierNo() + "");
+                    csvWriter.append(",");
+                    csvWriter.append(mp.getDiffUniqueOperatorNo() + "");
+                    csvWriter.append(",");
+                    csvWriter.append(mp.getDiffUniqueTokenNo() + "");
+                    csvWriter.append(",");
+                    csvWriter.append(mp.getSimilarFileNameScore() + "");
+                    csvWriter.append(",");
+                    csvWriter.append(mp.getSimilarMethodNameScore() + "");
+                    csvWriter.append(",");
+                    csvWriter.append(mp.isSameReturnType() + "");
                     csvWriter.append(",");
                 }
-                csvWriter.append(c2v[11] + ",?");
+                if(cmd.isSemantic()){
+                    double[] c2v = mp.getCode2VecSimilarityScore();
+                    for (int j = 0; j < 12; j++) {
+                        csvWriter.append(c2v[j] + "");
+                        csvWriter.append(",");
+                    }
+                }
+                if(mp.getId()%2==0){
+                    csvWriter.append("true");
+                }else {
+                    csvWriter.append("false");
+                }
+//                csvWriter.append(mp.isDecision()+"");
             }
             csvWriter.flush();
             csvWriter.close();
         }
+
+        System.out.println("Method Pair List size : " + methodPairList.size());
         if (cmd.isTraining()) {
             String[] wekaArgs = {"-tree_depth",cmd.getTreeDepth()+""};
             WekaTraining.main(wekaArgs);
         } else {
-            String[] predictArgs = {};
+            String[] predictArgs = {"-workingDir",cmd.getWorkingDir(),"-Syntactic",cmd.booleanString(cmd.isSyntactic()),"-Semantic",cmd.booleanString(cmd.isSemantic()),"-model",cmd.getModel()};
             Weka.main(predictArgs);
             String prediction;
             String result = "method1FileName,method1Start,Method1End,method1SourceCode,method2FileName,method2Start,Method2End,method2SourceCode";
             MongoClient mongoClient = new MongoClient(cmd.getDBUrl(), cmd.getDBPort());
-            DB database = mongoClient.getDB("Result");
+            DB database = mongoClient.getDB(cmd.getDBName());
             database.getCollectionNames().forEach(System.out::println);
             DBCollection collection = database.getCollection("Result");
             BasicDBObject document;
-            BufferedReader modelResultReader = new BufferedReader(new FileReader("result/result.csv"));
+            BufferedReader modelResultReader = new BufferedReader(new FileReader(cmd.getWorkingDir()+"/result/result.csv"));
+            FileWriter cloneWriter = new FileWriter(cmd.getOutputSource());
+            cloneWriter.write("");
+            System.out.println("Start Wrinting Result");
             while ((prediction = modelResultReader.readLine()) != null) {
                 String[] data = prediction.split(",");
-                if (data[data.length - 2].equalsIgnoreCase("true")&& data[data.length - 1].equalsIgnoreCase("true")) {
-                    int id = Integer.parseInt(data[0]);
-                    if (id == methodPairList.get(id).getId()) {
-                        Method m1 = methodPairList.get(id).getMethod1();
-                        Method m2 = methodPairList.get(id).getMethod2();
-//                        result += "\n"+m1.getFileName()+","+m1.getStartLine()+","+m1.getEndLine()+","+m1.getSourceCode()+","+m2.getFileName()+","+m2.getStartLine()+","+m2.getEndLine()+","+m2.getSourceCode();
-                        result += "\n" + m1.getFilePath() + "," + m1.getStartLine() + "," + m1.getEndLine() + "," + "," + m2.getFilePath() + "," + m2.getStartLine() + "," + m2.getEndLine() + ",";
-
+                if (data[data.length - 1].equalsIgnoreCase("true")) {
+                    int pairId = Integer.parseInt(data[0]);
+//                    System.out.println(id);
+                    if (pairId == methodPairList.get(pairId).getId()) {
+                        Method m1 = methodPairList.get(pairId).getMethod1();
+                        Method m2 = methodPairList.get(pairId).getMethod2();
+                        result = "\n" + m1.getFilePath() + "," + m1.getStartLine() + "," + m1.getEndLine() + "," + "," + m2.getFilePath() + "," + m2.getStartLine() + "," + m2.getEndLine() + ",";
+                        cloneWriter.append(result);
                         document = new BasicDBObject();
                         document.put("ExecutionID",cmd.getExecID());
                         document.put("File1Path",m1.getFilePath());
@@ -376,19 +470,11 @@ public class MerryEngine {
                     }
                 }
             }
-            FileWriter cloneWriter = new FileWriter(cmd.getOutputSource());
-            cloneWriter.write(result);
             cloneWriter.flush();
             cloneWriter.close();
-
-            //write result to mongoDB
-
-
+            System.out.println("Done Write Result");
+            mongoClient.close();
         }
-
-
-//        System.out.println("Sample Metric ... \n" + methodList.get(5).getMetricsAsString());
-        System.out.println("Method Pair List size : " + methodPairList.size());
         Date endDate = new Date();
         long endTime = endDate.getTime();
         long runTime = endTime - startTime;
