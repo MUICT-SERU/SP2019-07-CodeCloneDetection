@@ -10,6 +10,11 @@ public class CommandLineArgument {
     private int DBPort;
     private String outputSource ="result/clonesResult.csv";
     private String c2vPath;
+    private String workingDir;
+    private boolean isSyntactic = true;
+    private boolean isSemantic = true;
+    private String model = "SMO";
+    private String DBName = "MerryDB";
 
     public CommandLineArgument(String[] args){
         for(int i=0;i< args.length;i++) {
@@ -60,6 +65,37 @@ public class CommandLineArgument {
             if(args[i].equalsIgnoreCase("-c2vPath")){
                 this.c2vPath = args[i+1];
             }
+            if(args[i].equalsIgnoreCase("-workingDir")){
+                this.workingDir = args[i+1];
+            }
+            if(args[i].equalsIgnoreCase("-Syntactic")){
+                if (args[i + 1].equalsIgnoreCase("off")) {
+                    this.isSyntactic = false;
+                }
+            }
+            if(args[i].equalsIgnoreCase("-Semantic")){
+                if (args[i + 1].equalsIgnoreCase("off")) {
+                    this.isSemantic = false;
+                }
+            }
+            if(this.isSemantic == false && this.isSyntactic == false){
+                this.isSyntactic = true;
+                this.isSemantic = true;
+                System.out.println("Turn off both Syntactic metrics and Semantic metric \n this execution run with both metrics");
+            }
+            if(args[i].equalsIgnoreCase("-model")){
+                this.model = args[i+1];
+                if(this.model.equalsIgnoreCase("SMO")||this.model.equalsIgnoreCase("Dtree")||this.model.equalsIgnoreCase("decisionTree")||this.model.equalsIgnoreCase("randomForest")||this.model.equalsIgnoreCase("SVM")){
+
+                }else{
+                    this.model = "SMO";
+                    System.out.println("The execution can be run with SMO, DecisionTree, or randomForest only \n this execution run with SMO");
+                }
+            }
+            if(args[i].equalsIgnoreCase("-dbName")){
+                this.DBName = args[i+1];
+            }
+
         }
     }
 
@@ -105,5 +141,32 @@ public class CommandLineArgument {
 
     public String getC2vPath() {
         return c2vPath;
+    }
+
+    public String getWorkingDir() {
+        return workingDir;
+    }
+
+    public boolean isSyntactic() {
+        return isSyntactic;
+    }
+
+    public boolean isSemantic() {
+        return isSemantic;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public String booleanString(boolean boo){
+        if(boo){
+            return "on";
+        }
+        return "off";
+    }
+
+    public String getDBName() {
+        return DBName;
     }
 }

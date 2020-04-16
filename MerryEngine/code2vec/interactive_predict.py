@@ -60,15 +60,15 @@ class InteractivePredictor:
     #         return
 
     def predict(self):
-        basepath = '/Users/sidekoiii/Documents/GitHub/SP2019-DoNotCopy/MerryEngine/JavaMethods/'
+        basepath = '/Users/sidekoiii/Desktop/MerryStorage/JavaMethods/'
         path, dirs, files = next(os.walk(basepath))
         file_count = len(files)
         print(file_count)
         files = os.listdir(basepath)
-        with open('/Users/sidekoiii/Documents/GitHub/SP2019-DoNotCopy/MerryEngine/c2vVector.csv', 'w', newline='') as file:
-            writer = csv.writer(file)
+        with open('/Users/sidekoiii/Desktop/MerryStorage/assets/c2vVector.csv', 'w', newline='') as file_obj:
+            writer = csv.writer(file_obj)
             for file in files:
-                input_filename = '/Users/sidekoiii/Documents/GitHub/SP2019-DoNotCopy/MerryEngine/JavaMethods/' + str(file) + '.java'
+                input_filename = '/Users/sidekoiii/Desktop/MerryStorage/JavaMethods/' + str(file)
                 # print('Starting interactive prediction...on ' + str(i) + '.java')
                 try:
                     predict_lines, hash_to_string_dict = self.path_extractor.extract_paths(input_filename)
@@ -91,5 +91,4 @@ class InteractivePredictor:
                         writer.writerow([str(file), ' '.join(map(str, raw_prediction.code_vector))])
                     # print('Code vector:')
                     # print(' '.join(map(str, raw_prediction.code_vector)))
-        file.close()
         return
