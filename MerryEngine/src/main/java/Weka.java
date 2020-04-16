@@ -2,6 +2,7 @@ import org.netlib.arpack.Smout;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
+import weka.classifiers.functions.LibSVM;
 import weka.classifiers.functions.SMO;
 import weka.classifiers.trees.REPTree;
 import weka.classifiers.trees.RandomForest;
@@ -42,7 +43,7 @@ public class Weka{
             }else if(syn && !sem){
                 modelName = cmd.getWorkingDir()+"/models/DtreeOnlySyn_model.model";
             }else {
-                modelName = cmd.getWorkingDir()+"/models/DecesionTreeDefault_model.model";
+                modelName = cmd.getWorkingDir()+"/models/DTreeDefault_model.model";
             }
             model = (REPTree) weka.core.SerializationHelper.read(modelName);
         }
@@ -55,6 +56,16 @@ public class Weka{
                 modelName = cmd.getWorkingDir()+"/models/RandomForestDefault_model.model";
             }
             model = (RandomForest) weka.core.SerializationHelper.read(modelName);
+        }
+        if(cmd.getModel().equalsIgnoreCase("SVM")){
+            if(!syn && sem){
+                modelName = cmd.getWorkingDir()+"/models/LibSVMOnlyc2v_model.model";
+            }else if(syn && !sem){
+                modelName = cmd.getWorkingDir()+"/models/LibSVMOnlySyn_model.model";
+            }else {
+                modelName = cmd.getWorkingDir()+"/models/LibSVMDefault_model.model";
+            }
+            model = (LibSVM) weka.core.SerializationHelper.read(modelName);
         }
 
 
@@ -81,7 +92,7 @@ public class Weka{
         for(int i = 0; i< data.numInstances();i++){
             Instance instance = data.instance(i);
 //            int predictValue =0;
-            int predictValue = (int)model.classifyInstance(instance);
+            double predictValue = model.classifyInstance(instance);
 //            if(cmd.getModel().equalsIgnoreCase("justRandom")){
 //                int actual = (int)instance.classValue();
 //                predictValue = rand.nextInt(2);
@@ -121,8 +132,8 @@ public class Weka{
 //        System.out.println("FN:" + fn);
 //        System.out.println("_________________________________");
 //        Evaluation eval = new Evaluation(data);
-//        eval.evaluateModel(model,data);`
-//        System.out.println(eval.pctCorrect());
+//        eval.evaluateModel(model,data);
+////        System.out.println(eval.pctCorrect());
 //        System.out.println(data.classAttribute().value(0));
 //        System.out.println("Precision "+eval.precision(0));
 //        System.out.println("Recall "+eval.recall(0));

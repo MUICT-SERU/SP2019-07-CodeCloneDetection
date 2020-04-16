@@ -186,7 +186,7 @@ public class MerryEngine {
             }
             csvTrainingFalseReader.close();
         } else {
-//            //this part is for select only test( ground truth pair)
+            //this part is for select only test( ground truth pair)
 //            HashMap<String,String> originalFileNameHashMap = new HashMap<>();
 //            HashMap<String, Method> selectedMethodHashMap = new HashMap<>();
 //            BufferedReader csvTestingReader = new BufferedReader(new FileReader("/Users/sidekoiii/Desktop/testdataCSV/TestT1ToSt3Rand.csv"));
@@ -244,7 +244,6 @@ public class MerryEngine {
             for (Map.Entry<String, Method> entry : methodHashMap.entrySet()) {
                 methodList.add(entry.getValue());
             }
-//            System.out.println(methodList.size()+ "Sizeeee");
             int pairIDSetter = 0;
             for (int i = 0; i < methodList.size(); i++) {
                 for (int j = i + 1; j < methodList.size(); j++) {
@@ -253,8 +252,10 @@ public class MerryEngine {
                     if (useSizeFilter) {
                         int m1Tokens = methodList.get(i).getTokenNo();
                         int m2Tokens = methodList.get(j).getTokenNo();
+                        int m1Loc = methodList.get(i).getLineOfCode();
+                        int m2Loc = methodList.get(j).getLineOfCode();
                         double T = cmd.getSizeFilterThreshold();
-                        if (m1Tokens * T <= m2Tokens && m2Tokens <= m1Tokens / T) {
+                        if (m1Tokens * T <= m2Tokens && m2Tokens <= m1Tokens / T && m1Loc > 10 && m2Loc > 10) {
                             try{
                                 MethodPair methodPair = new MethodPair(pairIDSetter, methodList.get(i), methodList.get(j));
                                 methodPairList.add(methodPair);
@@ -436,7 +437,6 @@ public class MerryEngine {
             String[] predictArgs = {"-workingDir",cmd.getWorkingDir(),"-Syntactic",cmd.booleanString(cmd.isSyntactic()),"-Semantic",cmd.booleanString(cmd.isSemantic()),"-model",cmd.getModel()};
             Weka.main(predictArgs);
             String prediction;
-            String result = "method1FileName,method1Start,Method1End,method1SourceCode,method2FileName,method2Start,Method2End,method2SourceCode";
             MongoClient mongoClient = new MongoClient(cmd.getDBUrl(), cmd.getDBPort());
             DB database = mongoClient.getDB(cmd.getDBName());
             database.getCollectionNames().forEach(System.out::println);
@@ -444,13 +444,13 @@ public class MerryEngine {
             BasicDBObject document;
             BufferedReader modelResultReader = new BufferedReader(new FileReader(cmd.getWorkingDir()+"/result/result.csv"));
             FileWriter cloneWriter = new FileWriter(cmd.getOutputSource());
-            cloneWriter.write("");
+            String result = "method1FileName,method1Start,Method1End,method1SourceCode,method2FileName,method2Start,Method2End,method2SourceCode";
+            cloneWriter.write(result);
             System.out.println("Start Wrinting Result");
             while ((prediction = modelResultReader.readLine()) != null) {
                 String[] data = prediction.split(",");
                 if (data[data.length - 1].equalsIgnoreCase("true")) {
                     int pairId = Integer.parseInt(data[0]);
-//                    System.out.println(id);
                     if (pairId == methodPairList.get(pairId).getId()) {
                         Method m1 = methodPairList.get(pairId).getMethod1();
                         Method m2 = methodPairList.get(pairId).getMethod2();

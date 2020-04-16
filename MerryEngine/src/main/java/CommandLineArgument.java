@@ -85,7 +85,7 @@ public class CommandLineArgument {
             }
             if(args[i].equalsIgnoreCase("-model")){
                 this.model = args[i+1];
-                if(this.model.equalsIgnoreCase("SMO")||this.model.equalsIgnoreCase("Dtree")||this.model.equalsIgnoreCase("decisionTree")||this.model.equalsIgnoreCase("randomForest")||this.model.equalsIgnoreCase("justRandom")){
+                if(this.model.equalsIgnoreCase("SMO")||this.model.equalsIgnoreCase("Dtree")||this.model.equalsIgnoreCase("decisionTree")||this.model.equalsIgnoreCase("randomForest")||this.model.equalsIgnoreCase("SVM")){
 
                 }else{
                     this.model = "SMO";

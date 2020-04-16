@@ -2,14 +2,15 @@ import weka.classifiers.Classifier;
 import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.Evaluation;
 
+import weka.classifiers.functions.LibSVM;
 import weka.classifiers.functions.SMO;
-import weka.classifiers.pmml.consumer.SupportVectorMachineModel;
 import weka.classifiers.trees.REPTree;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.CSVSaver;
 import weka.core.converters.ConverterUtils;
+import weka.core.converters.LibSVMLoader;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Remove;
 import weka.gui.treevisualizer.PlaceNode2;
@@ -66,12 +67,16 @@ public class WekaTraining {
 //        RandomForest model = new RandomForest();
 //        model.buildClassifier(dataSet);
 
-        //SVM
-        SMO model = new SMO();
+        //SVM SMO
+//        SMO model = new SMO();
+//        model.buildClassifier(dataSet);
+
+        //LibSVM
+        LibSVM model = new LibSVM();
         model.buildClassifier(dataSet);
 
         //saving model
-        weka.core.SerializationHelper.write("models/SMOOnlyc2v"+"_model.model",model);
+        weka.core.SerializationHelper.write("models/LibSVMOnlyc2v"+"_model.model",model);
 //        //create model evaluation
 //        Evaluation eval = new Evaluation(dataSet);
 //
