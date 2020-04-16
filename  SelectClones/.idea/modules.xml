@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/CCLearner_Feature/CCLearner_Feature.iml" filepath="$PROJECT_DIR$/CCLearner_Feature/CCLearner_Feature.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CCLearner_Test/CCLearner_Test.iml" filepath="$PROJECT_DIR$/CCLearner_Test/CCLearner_Test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CCLearner_Train/CCLearner_Train.iml" filepath="$PROJECT_DIR$/CCLearner_Train/CCLearner_Train.iml" />
+    </modules>
+  </component>
+</project>
