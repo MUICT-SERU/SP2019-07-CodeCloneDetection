@@ -1,8 +1,3 @@
-const args = [
-  "clone",
-  'https://github.com/weekitaus/junit4.git',
-  "./temp"
-];
+const execSync = require("child_process").execSync;
 
-const child = require("child_process").spawnSync("git", args);
-console.log(`${child.stderr}`);
+  execSync('java -jar MerryEngine.jar -DBport 27017 -DBurl localhost -c2vpath C:\\Users\\User\\Documents\\SP2019-DNC\\nodeJS_Rest\\code2vec -workingdir C:\\Users\\User\\Documents\\SP2019-DNC\\nodeJS_Rest\\dumpFolder -input C:\\Users\\User\\Documents\\SP2019-DNC\\nodeJS_Rest\\temp -output C:\\Users\\User\\Documents\\SP2019-DNC\\nodeJS_Rest\\output.csv');

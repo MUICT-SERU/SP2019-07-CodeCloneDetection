@@ -10,18 +10,20 @@ const config = require('./config/config.js')
 const fs = require('fs');
 const app = express()
 const cookieParser = require("cookie-parser");
-var Git = require('nodegit')
+var ObjectID = require('mongodb').ObjectID;
+var Git = require('nodegit');
+
 app.use(cookieParser())
 app.use(bodyParser.json({ type: 'application/json' }))
 
 const clientID = `${global.gConfig.clientID}`;
 const clientSecret = `${global.gConfig.clientSecret}`;
 
-var dburl = "mongodb://localhost:27017/";
+var dburl = `${global.gConfig.mongoUrl}`;
 
 const lineReader = require('line-reader');
 
-var accessToken;
+
 // Declare the redirect route
 app.get('/oauth/redirect', (req, res) => {
   // The req.query object has the query params that
@@ -61,82 +63,115 @@ app.post('/api/clone', function(req, res) {
 
   const child = require("child_process").spawnSync("git", args);
 console.log("clone");
-    execSync('java -jar simian-2.5.10.jar -reportDuplicateText ./temp/**.java > .\\output.txt | type .\\output.txt')
-      execSync('rmdir /s /q .\\temp')
+var ObjectId = new ObjectID();
         var user = `${req.body.user}`;
         var repoName = `${req.body.reposName}`;
         let time = moment().format('MMMM Do YYYY, H:mm:ss');
+        let obj = { _id: ObjectId, owner: user, repoName: repoName, date: time};
+        execSync('java -jar MerryEngine.jar -DBport 27017 -DBurl localhost -execID '+ ObjectId +' -c2vpath C:\\Users\\User\\Documents\\SP2019-DNC\\nodeJS_Rest\\code2vec -workingdir C:\\Users\\User\\Documents\\SP2019-DNC\\nodeJS_Rest\\dumpFolder -input C:\\Users\\User\\Documents\\SP2019-DNC\\nodeJS_Rest\\temp -output C:\\Users\\User\\Documents\\SP2019-DNC\\nodeJS_Rest\\output.csv')
+        console.log("Done getting results");
+
+        MongoClient.connect(dburl, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+        }, function(err, db) {
+          if (err) throw err;
+          var dbo = db.db("MerryDB");
+            dbo.collection("analysedRepoInfo").insertOne(obj, function(err, res) {
+              if (err) throw err;
+              console.log("document inserted");
+        db.close();
+        });
+        });
+
+              execSync('rmdir /s /q .\\temp')
+              console.log("remove folder");
+
+res.json(obj);
+})
+
+//This is API for analyze clone for non-github users
+app.post('/api/guestclone', function(req, res) {
+//clone from github function
+const args = [
+  "clone",
+  `${req.body.github}`,
+  "./temp"
+];
+
+const child = require("child_process").spawnSync("git", args);
+console.log("clone");
+    //execute simian tool function and output in text file
+    execSync('java -jar simian-2.5.10.jar -reportDuplicateText ./temp/**.java > .\\output.txt | type .\\output.txt')
+    console.log("execute tool");
+      //remove temp folder
+      execSync('rmdir /s /q .\\temp')
+      console.log("remove folder");
+        //read output.text file that generate while cloning from github
         let data = fs.readFileSync('./output.txt','utf8');
-        let obj = {owner: user, repoName: repoName, result: data, date: time};
-    res.json(obj);
+        let obj = {result: data};
+        //return reponse in json
+        res.json(obj);
+        //connect to mongodb
         MongoClient.connect(dburl, {
         useUnifiedTopology: true,
         useNewUrlParser: true,
         }, function(err, db) {
           if (err) throw err;
-          var dbo = db.db("Data");
-            dbo.collection("analysedClone").insertOne(obj, function(err, res) {
+          //find database "Data"
+          var dbo = db.db("MerryDB");
+          //find collection "tempAnalysed" and insert json name "obj"
+            dbo.collection("tempAnalysed").insertOne(obj, function(err, res) {
               if (err) throw err;
               console.log("document inserted");
               db.close();
         });
         });
-
 })
 
-app.post('/api/guestclone', function(req, res) {
-
-  execSync('git clone '+`${req.body.github} ./temp`, (error, stdout, stderr) => {
-    if (error) {
-        console.error(`exec error: ${error}`);
-        return;
-      }
-      console.log(`stdout: ${stdout}`);
-      // console.error(`stderr: ${stderr}`);
-
-      // <script>document.getElementById('toggle').click();</script>
-    })
-    execSync('java -jar simian-2.5.10.jar -reportDuplicateText ./temp/*.java > .\\output.txt | type .\\output.txt', (error, stdout, stderr) => {
-      if (error) {
-          console.error(`exec error: ${error}`);
-        }
-        console.log(`stdout: ${stdout}`);
-        // console.error(`stderr: ${stderr}`);
-        // console.log(objCheck);
-      })
-      execSync('rmdir /s /q .\\temp', (error, stdout, stderr) => {
-        if (error) {
-            console.error(`exec error: ${error}`);
-          }
-          console.log('successfully remove temp folder');
-          // console.error(`stderr: ${stderr}`);
-          // console.log(objCheck);
-        })
-        let data = fs.readFileSync('./output.txt','utf8');
-        let obj = {result: data};
-        res.json(obj);
-})
-
-app.get('/api/getResult', function(req, res){
+app.get('/api/getLatestResult', function(req, res){
   MongoClient.connect(dburl, {
   useUnifiedTopology: true,
   useNewUrlParser: true,
   }, function(err, db) {
     if (err) throw err;
-    var dbo = db.db("Data");
-    //Sort the result by name:
-    var sort = { date: -1 };
-    dbo.collection("analysedClone").find().sort(sort).limit(1).toArray(function(err, result) {
-      if (err) throw err;
-        res.json(result);
-      console.log(result);
-      db.close();
-    });
+    var dbo = db.db("MerryDB");
+    //Sort the result by latest date:
+    dbo.collection('analysedRepoInfo').aggregate([
+       { $sort : { _id : -1 } },
+       { $limit: 1 },
+      {
+    $project: {
+      _id: {
+        $toString: "$_id"
+      }
+    }
+  },
+    {
+      $lookup:
+       {
+         from: 'Result',
+         localField: '_id',
+         foreignField: 'ExecutionID',
+         as: 'cloneResult'
+       }
+     }
+   ]).toArray(function(err, result) {
+    if (err) throw err;
+    console.log(JSON.stringify(result));
+    res.json(result)
+    db.close();
+  });
   });
  });
-
+ app.get('/setting', function(req, res){
+   res.redirect(`http://localhost:8001/setting.html?access_token=${req.query.accessToken}`);
+ })
  app.get('/history', function(req, res){
    res.redirect(`http://localhost:8001/history.html?access_token=${req.query.accessToken}`);
+ })
+ app.get('/result', function(req, res){
+   res.redirect(`http://localhost:8001/Result.html?access_token=${req.query.accessToken}`);
  })
  app.get('/welcome', function(req, res){
    res.redirect(`http://localhost:8001/welcome.html?access_token=${req.query.accessToken}`);
@@ -150,11 +185,11 @@ app.get('/api/getResult', function(req, res){
    useNewUrlParser: true,
    }, function(err, db) {
      if (err) throw err;
-     var dbo = db.db("Data");
+     var dbo = db.db("MerryDB");
      //Sort the result by name:
    var quary = {owner: req.body.owner, repoName: req.body.reposName};
-     var sort = { date: -1 };
-     dbo.collection("analysedClone").find(quary).sort(sort).toArray(function(err, result) {
+     var sort = { ExecutionID: 1 };
+     dbo.collection("analysedRepoInfo").find(quary).sort(sort).toArray(function(err, result) {
        if (err) throw err;
          res.json(result);
        console.log("Query success!");
@@ -168,11 +203,11 @@ app.post('/getHistory', function(req, res){
   useNewUrlParser: true,
   }, function(err, db) {
     if (err) throw err;
-    var dbo = db.db("Data");
+    var dbo = db.db("MerryDB");
     //Sort the result by name:
   var quary = {owner: req.body.owner};
     var sort = { date: -1 };
-    dbo.collection("analysedClone").find(quary).sort(sort).toArray(function(err, result) {
+    dbo.collection("analysedRepoInfo").find(quary).sort(sort).toArray(function(err, result) {
       if (err) throw err;
         res.json(result);
       console.log("Query success!");

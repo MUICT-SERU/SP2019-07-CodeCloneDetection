@@ -21,11 +21,14 @@
                 <img src="/images/logo.png" alt="Merry's logo" style="width:70px;height:70px;">
               </a>
           </li>
-        <li class="nav-item" style="padding-top:15%">
-            <span class="nav-link" id="fake-link-1" style="color: blue;cursor: pointer;">Respositories</span>
-        </li>
+          <li class="nav-item" style="padding-top:17%;padding-left:5%">
+  						<span id="fake-link-1" style="color: blue;cursor: pointer;">Respos</span>
+  				</li>
+  				<li class="nav-item" style="padding-top:17%;padding-left:13%;">
+  						<span id="settingLink" style="color: blue;cursor: pointer;">Setting</span>
+  				</li>
       </ul>
-  <ul class="nav justify-content-end" id="menu" style="padding-left:83%">
+  <ul class="nav justify-content-end" id="menu" style="padding-left:78%">
     <li class="nav-item"id="ProPic">
 
     </li>
@@ -142,5 +145,12 @@ function getMongoData(githubName){
               window.location.href = res.url;
           } })
   })
+  $('#settingLink').click(function(){
+		fetch('http://localhost:8001/setting/?accessToken='+token, { method:"GET", redirect:"follow" }).then( res => {
+			if (res.redirected) {
+							window.location.href = res.url;
+						}
+					})
+		})
 </script>
 </html>

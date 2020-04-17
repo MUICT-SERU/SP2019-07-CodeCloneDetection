@@ -10,8 +10,8 @@
 		 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
 		 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 		 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+		 <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
 		 <link href="styles.css" rel="stylesheet" />
-
 </head>
 
 <body>
@@ -22,11 +22,14 @@
 								<img src="/images/logo.png" alt="Merry's logo" style="width:70px;height:70px;">
 							</a>
 					</li>
-				<li class="nav-item" style="padding-top:20%">
-						<span class="nav-link" id="fake-link-1" style="color: blue;cursor: pointer;">History</span>
+				<li class="nav-item" style="padding-top:17%;padding-left:5%">
+						<span id="fake-link-1" style="color: blue;cursor: pointer;">History</span>
+				</li>
+				<li class="nav-item" style="padding-top:17%;padding-left:13%;">
+						<span id="settingLink" style="color: blue;cursor: pointer;">Setting</span>
 				</li>
 			</ul>
- <ul class="nav justify-content-end" id="menu" style="padding-left:83%">
+ <ul class="nav justify-content-end" id="menu" style="padding-left:78%">
 	 	<li class="nav-item"id="ProPic">
 
 		</li>
@@ -74,7 +77,7 @@
 			<div id="finishModal" style="font-size:16px"></div>
 			<p><button id="toggle" type="button" class="btn btn-success" style="display:none">Toggle Completed</button></p>
 			<div style="padding-left:40%;size:30px">
-			<a id="viewResultButtonArea" href="./Result.html" class="btn btn-success" style="display:none">view result</a>
+			<button id="viewResultButtonArea" class="btn btn-success" style="display:none" onclick="gotoResult()">view result</button>
 		</div>
     </div>
   </div>
@@ -220,8 +223,16 @@ $('#launchLoading').click()
 		fetch('http://localhost:8001/historyRepo/?repository='+repoData+'&accessToken='+accessToken, { method:"GET", redirect:"follow" }).then( res => {
 			if (res.redirected) {
 							window.location.href = res.url;
-					} })
+					}
+				})
 	}
+	$('#settingLink').click(function(){
+		fetch('http://localhost:8001/setting/?accessToken='+token, { method:"GET", redirect:"follow" }).then( res => {
+			if (res.redirected) {
+							window.location.href = res.url;
+						}
+					})
+		})
 
 	function logoutFunc(){
 		fetch('http://localhost:8001/api/logout', { method:"GET" }).then( async (res)=>{
@@ -229,13 +240,20 @@ $('#launchLoading').click()
 		});
 	}
 $('#fake-link-1').click(function(){
-	var urlString = window.location.search;
-	urlSplit = urlString.split("=");
-	accessToken = urlSplit[1]
 	fetch('http://localhost:8001/history/?accessToken='+token, { method:"GET", redirect:"follow" }).then(res => {
 		if (res.redirected) {
             window.location.href = res.url;
-        } })
+        }
+			})
 })
+function gotoResult(){
+	var urlString = window.location.search;
+	urlSplit = urlString.split("=");
+	accessToken = urlSplit[1];
+	fetch('http://localhost:8001/result/?accessToken='+accessToken, { method:"GET", redirect:"follow" }).then( res => {
+		if (res.redirected) {
+						window.location.href = res.url;
+				} })
+}
 </script>
 </html>

@@ -1,0 +1,4 @@
+public CryptoExtension(Configuration conf, KeyProviderCryptoExtension keyProviderCryptoExtension) {
+    this.keyProviderCryptoExtension = keyProviderCryptoExtension;
+    encKeyVersionQueue = new ValueQueue<KeyProviderCryptoExtension.EncryptedKeyVersion>(conf.getInt(KMS_KEY_CACHE_SIZE, KMS_KEY_CACHE_SIZE_DEFAULT), conf.getFloat(KMS_KEY_CACHE_LOW_WATERMARK, KMS_KEY_CACHE_LOW_WATERMARK_DEFAULT), conf.getInt(KMS_KEY_CACHE_EXPIRY_MS, KMS_KEY_CACHE_EXPIRY_DEFAULT), conf.getInt(KMS_KEY_CACHE_NUM_REFILL_THREADS, KMS_KEY_CACHE_NUM_REFILL_THREADS_DEFAULT), SyncGenerationPolicy.LOW_WATERMARK, new EncryptedQueueRefiller());
+}

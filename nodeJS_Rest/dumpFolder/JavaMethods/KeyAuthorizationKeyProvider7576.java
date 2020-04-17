@@ -1,0 +1,1 @@
+public boolean hasAccessToKey(String aclName, UserGroupInformation ugi, KeyOpType opType);
