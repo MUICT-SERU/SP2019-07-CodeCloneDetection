@@ -23,11 +23,14 @@
               <img src="/images/logo.png" alt="Merry's logo" style="width:70px;height:70px;">
             </a>
         </li>
-      <li class="nav-item" style="padding-top:15%">
-          <a class="nav-link" href="/Result.html">Result</a>
-      </li>
+				<li class="nav-item" style="padding-top:17%;padding-left:5%">
+						<span id="fake-link-1" style="color: blue;cursor: pointer;">Respository</span>
+				</li>
+				<li class="nav-item" style="padding-top:17%;padding-left:13%;">
+						<span id="settingLink" style="color: blue;cursor: pointer;">Setting</span>
+				</li>
     </ul>
-<ul class="nav justify-content-end" id="menu" style="padding-left:83%">
+<ul class="nav justify-content-end" id="menu" style="padding-left:78%">
   <li class="nav-item"id="ProPic">
 
   </li>
@@ -37,28 +40,160 @@
       </ul>
 </nav>
 
-<div id="TextOutput" style="padding-left:7%;font:20px"></div>
+<h1 style="padding-left:30px;padding-top:10px;">Result</h1><div style="padding-left:87%;"><button id="backResult" style="margin-bottom: 15px;margin-right:15px;" class="previous">Back</button><button id="nextResult" style="margin-bottom:15px;" class="next">Next</button></div>
+<table id="showResultArea" class="table table-bordered" style="table-layout:fixed;width:98%;" align="center">
+	<thead>
+<tr>
+	<th colspan="2" id="" style="text-align:center"><h1 id="tilteTable"></h1></th>
+</tr>
+</thead>
+<tr>
+	<td id="Path1"></td>
+	<td id="Path2"></td>
+</tr>
+<tr>
+	<td id="startEnd1"></td>
+	<td id="startEnd2"></td>
+</tr>
+<tr>
+	<td><pre class="prettyprint" id="result1Area"></pre></td>
+	<td><pre class="prettyprint" id="result2Area"></pre></td>
+</tr>
+</table>
 </body>
 <script>
 
   const query = window.location.search.substring(1)
   const token = query.split('access_token=')[1]
 
-fetch('http://localhost:8001/api/getResult').then(async (res) => {
+	fetch('https://api.github.com/user',{
+		headers: new Headers({
+        'Authorization': 'token ' + token,
+    		}),
+			}, {method : 'GET'})
+		// Parse the response as JSON
+		.then(res => res.json())
+		.then(res =>{
+			window.dataName = `${res.login}`;
+			window.githubPicture = `${res.avatar_url}`;
+			const NameOwner = document.createTextNode(dataName)
+			const ProfilePicture = document.createElement("img")
+			ProfilePicture.setAttribute("style","width:70px;height:70px;")
+			ProfilePicture.setAttribute("class", "img-thumbnail")
+			ProfilePicture.src = githubPicture;
+			document.getElementById("ProPic").appendChild(ProfilePicture)
+		})
+
+fetch('http://localhost:8001/api/getLatestResult').then(async (res) => {
 	const data = await res.json();
 	console.log(data);
-		var json = `${data[0].result}`;
-		var jsonArray = json.split("\r\n");
-for(i=0; i < jsonArray.length; i++){
-const splitedResult = document.createTextNode(jsonArray[i]);
-const div = document.getElementById('TextOutput');
- const br = document.createElement('br');
-div.appendChild(splitedResult);
-div.appendChild(br);
-	}
+	var i = 0;
+
+$(function() {
+
+	const count = document.createTextNode("Clone pair No."+(i+1));
+	document.getElementById("tilteTable").appendChild(count);
+	var filePath1 = document.createTextNode(`${data[0].cloneResult[i].File1Path}`);
+	var filePath2 = document.createTextNode(`${data[0].cloneResult[i].File2Path}`);
+	document.getElementById("Path1").appendChild(filePath1);
+	document.getElementById("Path2").appendChild(filePath2);
+
+	var Line1 = document.createTextNode(`Line: ${data[0].cloneResult[i].startLine1} - ${data[0].cloneResult[i].endLine1}`);
+	var Line2 = document.createTextNode(`Line: ${data[0].cloneResult[i].startLine2} - ${data[0].cloneResult[i].endLine2}`);
+	document.getElementById("startEnd1").appendChild(Line1);
+	document.getElementById("startEnd2").appendChild(Line2);
+
+	const R1A = document.getElementById("result1Area");
+	const R2A = document.getElementById("result2Area");
+	var json1 = document.createTextNode(`${data[0].cloneResult[i].sourceCode1}`);
+	var json2 = document.createTextNode(`${data[0].cloneResult[i].sourceCode2}`);
+
+	document.getElementById("result1Area").appendChild(json1);
+	document.getElementById("result2Area").appendChild(json2);
+
+  $("#nextResult").on("click", function() {
+    i++;
+		const count = document.createTextNode("Clone pair No."+(i+1));
+		document.getElementById("tilteTable").appendChild(count);
+		document.getElementById("tilteTable").removeChild(tilteTable.firstChild);
+
+		var filePath1 = document.createTextNode(`${data[0].cloneResult[i].File1Path}`);
+		var filePath2 = document.createTextNode(`${data[0].cloneResult[i].File2Path}`);
+		document.getElementById("Path1").appendChild(filePath1);
+		document.getElementById("Path2").appendChild(filePath2);
+
+		document.getElementById("Path1").removeChild(Path1.firstChild);
+		document.getElementById("Path2").removeChild(Path2.firstChild);
+
+		var Line1 = document.createTextNode(`Line: ${data[0].cloneResult[i].startLine1} - ${data[0].cloneResult[i].endLine1}`);
+		var Line2 = document.createTextNode(`Line: ${data[0].cloneResult[i].startLine2} - ${data[0].cloneResult[i].endLine2}`);
+		document.getElementById("startEnd1").appendChild(Line1);
+		document.getElementById("startEnd2").appendChild(Line2);
+
+		document.getElementById("startEnd1").removeChild(startEnd1.firstChild);
+		document.getElementById("startEnd2").removeChild(startEnd2.firstChild);
+
+		const R1A = document.getElementById("result1Area");
+		const R2A = document.getElementById("result2Area");
+		var json1 = document.createTextNode(`${data[0].cloneResult[i].sourceCode1}`);
+		var json2 = document.createTextNode(`${data[0].cloneResult[i].sourceCode2}`);
+		document.getElementById("result1Area").appendChild(json1);
+		document.getElementById("result2Area").appendChild(json2);
+
+		document.getElementById("result1Area").removeChild(result1Area.firstChild);
+		document.getElementById("result2Area").removeChild(result2Area.firstChild);
+  });
+
+  $("#backResult").on("click", function() {
+		i--;
+		const count = document.createTextNode("Clone pair No."+(i+1));
+		document.getElementById("tilteTable").appendChild(count);
+		document.getElementById("tilteTable").removeChild(tilteTable.firstChild);
+
+		var filePath1 = document.createTextNode(`${data[0].cloneResult[i].File1Path}`);
+		var filePath2 = document.createTextNode(`${data[0].cloneResult[i].File2Path}`);
+		document.getElementById("Path1").appendChild(filePath1);
+		document.getElementById("Path2").appendChild(filePath2);
+
+		document.getElementById("Path1").removeChild(Path1.firstChild);
+		document.getElementById("Path2").removeChild(Path2.firstChild);
+
+		var Line1 = document.createTextNode(`Line: ${data[0].cloneResult[i].startLine1} - ${data[0].cloneResult[i].endLine1}`);
+		var Line2 = document.createTextNode(`Line: ${data[0].cloneResult[i].startLine2} - ${data[0].cloneResult[i].endLine2}`);
+		document.getElementById("startEnd1").appendChild(Line1);
+		document.getElementById("startEnd2").appendChild(Line2);
+
+		document.getElementById("startEnd1").removeChild(startEnd1.firstChild);
+		document.getElementById("startEnd2").removeChild(startEnd2.firstChild);
+
+		const R1A = document.getElementById("result1Area");
+		const R2A = document.getElementById("result2Area");
+		var json1 = document.createTextNode(`${data[0].cloneResult[i].sourceCode1}`);
+		var json2 = document.createTextNode(`${data[0].cloneResult[i].sourceCode2}`);
+		document.getElementById("result1Area").appendChild(json1);
+		document.getElementById("result2Area").appendChild(json2);
+
+		document.getElementById("result1Area").removeChild(result1Area.firstChild);
+		document.getElementById("result2Area").removeChild(result2Area.firstChild);
+  });
 })
-
-
+})
+$('#fake-link-1').click(function(){
+	var urlString = window.location.search;
+	urlSplit = urlString.split("access_token=");
+	accessToken = urlSplit[1];
+	fetch('http://localhost:8001/welcome/?accessToken='+accessToken, { method:"GET", redirect:"follow" }).then( res => {
+		if (res.redirected) {
+						window.location.href = res.url;
+				} })
+})
+$('#settingLink').click(function(){
+	fetch('http://localhost:8001/setting/?accessToken='+token, { method:"GET", redirect:"follow" }).then( res => {
+		if (res.redirected) {
+						window.location.href = res.url;
+					}
+				})
+	})
 
   </script>
 </html>

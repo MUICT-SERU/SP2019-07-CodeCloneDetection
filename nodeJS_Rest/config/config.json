@@ -3,6 +3,7 @@
     "app_name": "Merry App",
     "node_port": 8001,
     "clientID": "31ec50555fca84725afa",
-    "clientSecret": "a3d38c40372c265b0942450d0ebf1c1d1dad54b1"
+    "clientSecret": "a3d38c40372c265b0942450d0ebf1c1d1dad54b1",
+    "mongoUrl": "mongodb://localhost:27017/"
   }
 }

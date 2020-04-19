@@ -1,0 +1,1 @@
+void logAuditEvent(final OpStatus status, final AuditEvent event);
