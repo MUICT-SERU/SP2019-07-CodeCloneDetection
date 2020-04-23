@@ -3,6 +3,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
   	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<!-- Popper JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
   	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -20,11 +31,14 @@
                 <img src="/images/logo.png" alt="Merry's logo" style="width:70px;height:70px;">
               </a>
           </li>
-        <li class="nav-item" style="padding-top:15%">
-            <span class="nav-link" id="fake-link-1" style="color: blue;cursor: pointer;">Respositories</span>
+        <li class="nav-item" style="padding-top:8%">
+            <span class="nav-link" id="fake-link-1" style="color: blue;cursor: pointer;font-size:24;">Respos</span>
         </li>
+        <li class="nav-item" style="padding-top:10%;padding-left:5%">
+						<span id="HistoryLink" style="color: blue;cursor: pointer;;font-size:24px">History</span>
+				</li>
       </ul>
-  <ul class="nav justify-content-end" id="menu" style="padding-left:83%">
+  <ul class="nav justify-content-end" id="menu" style="padding-left:75%">
     <li class="nav-item"id="ProPic">
 
     </li>
@@ -34,11 +48,50 @@
         </ul>
   </nav>
   <body>
-<h1>This is setting page</h1>
-  <label class="switch">
-    <input type="checkbox">
-    <span class="slider round"></span>
-  </label>
+<b style="font-size:45px;margin:20px;padding-left:45%">Setting</b>
+<table border="0" style="width:98%" align="center">
+  <tr>
+    <td align="center"><h2 style="padding-bottom:5px">Size Filter</h2>
+    <div style="padding-left:1%;padding-top:10px">
+      <label class="switch"><input type="checkbox" id="SizeFilterButton"><div class="slider round"><!--ADDED HTML --><span class="off">OFF</span><span class="on">ON</span><!--END--></div></label>
+      </label>
+    </div></td>
+    <td align="center"><h2 style="padding-bottom:5px">syntactic metrics</h2>
+    <div style="padding-left:1%;padding-top:10px">
+      <label class="switch"><input type="checkbox" id="SynButton"><div class="slider round"><!--ADDED HTML --><span class="off">OFF</span><span class="on">ON</span><!--END--></div></label>
+      </label>
+    </div></td>
+  </tr>
+  <tr>
+    <td style="padding-left:18%"><h2 style="padding-top:5px;padding-bottom:5px">Select Model</h2>
+      <div style="padding=left:10%">
+    <div class="form-check">
+      <input type="radio" id="DT" name="model" value="DT">
+      <label for="male">Decision Tree</label>
+    </div>
+    <div class="form-check">
+      <input type="radio" id="RF" name="model" value="RF">
+      <label for="female">Random forest</label>
+    </div>
+    <div class="form-check">
+      <input type="radio" id="SVM" name="model" value="SVM">
+      <label for="SVM">SVM</label>
+    </div>
+    <div class="form-check">
+      <input type="radio" id="SMO" name="model" value="SMO">
+      <label for="SMO">SVM using SMO</label>
+    </div>
+    </div></td>
+    <td align="center"><h2 style="padding-bottom:5px">semantic metrics</h2>
+    <div style="padding-left:1%;padding-top:10px">
+      <label class="switch"><input type="checkbox" id="SemButton"><div class="slider round"><!--ADDED HTML --><span class="off">OFF</span><span class="on">ON</span><!--END--></div></label>
+      </label>
+  </div></td>
+  </tr>
+</table>
+<div style="padding-top:18%" align="center">
+  <button type="button" class="btn btn-primary btn-lg" style="background-color: #73b504;border-color:grey;padding: 16px 100px;font-size:20px">Save Setting</button>
+</div>
   </body>
   <script>
     const query = window.location.search.substring(1)
@@ -53,15 +106,12 @@
       .then(res =>{
         var githubName = `${res.login}`;
         var githubPicture = `${res.avatar_url}`;
-        const NameRepo = document.createTextNode(respositoryName)
-        document.getElementById("TitleRepo").appendChild(NameRepo)
         const ProfilePicture = document.createElement("img")
         ProfilePicture.setAttribute("style","width:70px;height:70px;")
         ProfilePicture.setAttribute("class", "img-thumbnail")
         ProfilePicture.src = githubPicture;
 
         document.getElementById("ProPic").appendChild(ProfilePicture)
-        getMongoData(`${res.login}`);
       })
 
       $('#fake-link-1').click(function(){
@@ -72,6 +122,13 @@
       		if (res.redirected) {
                   window.location.href = res.url;
               } })
+      })
+      $('#HistoryLink').click(function(){
+      	fetch('http://localhost:8001/history/?accessToken='+token, { method:"GET", redirect:"follow" }).then(res => {
+      		if (res.redirected) {
+                  window.location.href = res.url;
+              }
+      			})
       })
   </script>
 </html>

@@ -21,14 +21,14 @@
                 <img src="/images/logo.png" alt="Merry's logo" style="width:70px;height:70px;">
               </a>
           </li>
-          <li class="nav-item" style="padding-top:17%;padding-left:5%">
-  						<span id="fake-link-1" style="color: blue;cursor: pointer;">Respos</span>
+          <li class="nav-item" style="padding-top:10%;padding-left:5%">
+  						<span id="fake-link-1" style="color: blue;cursor: pointer;font-size:24px">Respos</span>
   				</li>
-  				<li class="nav-item" style="padding-top:17%;padding-left:13%;">
-  						<span id="settingLink" style="color: blue;cursor: pointer;">Setting</span>
+  				<li class="nav-item" style="padding-top:10%;padding-left:10%;">
+  						<span id="settingLink" style="color: blue;cursor: pointer;font-size:24px">Setting</span>
   				</li>
       </ul>
-  <ul class="nav justify-content-end" id="menu" style="padding-left:78%">
+  <ul class="nav justify-content-end" id="menu" style="padding-left:75%">
     <li class="nav-item"id="ProPic">
 
     </li>
@@ -112,6 +112,8 @@ function getMongoData(githubName){
 				ResultButton.innerHTML = "Result"
 				ResultButton.setAttribute("id", "Resultnum"+[i])
 				ResultButton.setAttribute("style", "margin-left:8%;")
+        ResultButton.setAttribute("onclick", "gotoResultById('"+data[i]._id+"')")
+
         if(j==0){
           td.appendChild(count)
         }else if(j==1){
@@ -151,6 +153,13 @@ function getMongoData(githubName){
 							window.location.href = res.url;
 						}
 					})
-		})
+		});
+    function gotoResultById(idRepo){
+      fetch('http://localhost:8001/gotoResultById/?id='+idRepo+'&accessToken='+token, { method:"GET", redirect:"follow"}).then(res=> {
+        if(res.redirected){
+          window.location.href = res.url;
+        }
+      })
+    }
 </script>
 </html>
