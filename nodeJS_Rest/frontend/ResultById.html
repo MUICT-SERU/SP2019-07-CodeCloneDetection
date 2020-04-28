@@ -30,16 +30,28 @@
 						<span id="settingLink" style="color: blue;cursor: pointer;font-size:24px">Setting</span>
 				</li>
     </ul>
-<ul class="nav justify-content-end" id="menu" style="padding-left:75%">
+<ul class="nav justify-content-end" id="menu" style="padding-left:73%">
   <li class="nav-item"id="ProPic">
 
   </li>
         <li class="nav-item">
-            <b class="nav-link" id="logout-button" onclick="logoutFunc()" style="padding-top:35%">Logout</b>
+					<div style="padding-top:35%">
+							<b class="nav-link" style="cursor:pointer" id="logout-button">Logout</b>
+						</div>
         </li>
       </ul>
 </nav>
-
+<div align="center">
+<button onclick="HideShowChart()">Hide/show Chart</button>
+</div>
+<div id="chartArea">
+<table style="table-layout:fixed;width:98%;" align="center">
+	<tr>
+		<th id="piechartLine"></th>
+		<th id="pieChartMethods"></th>
+	</tr>
+</table>
+</div>
 <h1 style="padding-left:30px;padding-top:10px;">Result</h1><div style="padding-left:87%;"><button id="backResult" style="margin-bottom: 15px;margin-right:15px;" class="previous">Back</button><button id="nextResult" style="margin-bottom:15px;" class="next">Next</button></div>
 <table id="showResultArea" class="table table-bordered" style="table-layout:fixed;width:98%;" align="center">
 	<thead>
@@ -61,6 +73,7 @@
 </tr>
 </table>
 </body>
+ <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script>
 
   const query = window.location.search.substring(1)
@@ -87,6 +100,7 @@
 		var urlData = window.location.search;
 		var id = urlData.substring( urlData.indexOf("=")+1, urlData.indexOf("&"))
 		var data = ({id: id});
+		console.log(data);
 		const headers = {
 			'Accept': 'application/json',
 			'Content-Type': 'application/json'
@@ -106,12 +120,64 @@ fetch('http://localhost:8001/api/getResultById', payload).then(async (res) => {
 	console.log(data);
 	var i = 0;
 
+		var lineClone = data[0].cloneCount[0].clone_loc;
+		console.log(lineClone);
+		var lineCode = data[0].cloneCount[0].total_loc;
+		var lineNonClone = data[0].cloneCount[0].total_loc-data[0].cloneCount[0].clone_loc;
+		var methodcode = data[0].cloneCount[0].total_methods;
+		var methodClone = data[0].cloneCount[0].clone_methods;
+		var methodNonClone = methodcode-methodClone;
+		// Load google charts
+
+	google.charts.load('current', {'packages':['corechart']});
+	google.charts.setOnLoadCallback(drawChartLine);
+
+	// Draw the chart and set the chart values
+	function drawChartLine() {
+	  var data = google.visualization.arrayToDataTable([
+			['line of Code', 'number'],
+	  ['line of Clone', lineClone],
+		['line of Non-Clone', lineNonClone]
+	]);
+
+	  // Optional; add a title and set the width and height of the chart
+	  var options = {'title':'Percent of Clone Line of Code and Non-Clone Line of Code', 'width':550, 'height':400};
+
+	  // Display the chart inside the <div> element with id="piechart"
+	  var chart = new google.visualization.PieChart(document.getElementById('piechartLine'));
+	  chart.draw(data, options);
+	}
+	google.charts.load('current', {'packages':['corechart']});
+	google.charts.setOnLoadCallback(drawChartMethods);
+
+	// Draw the chart and set the chart values
+	function drawChartMethods() {
+	  var data = google.visualization.arrayToDataTable([
+			['Methods of Code', 'number'],
+	  ['Methods of Clone', methodClone],
+		['Methods of Non-Clone', lineNonClone]
+	]);
+
+	  // Optional; add a title and set the width and height of the chart
+	  var options = {'title':'Percent of Clone Methods and Non-Clone Method', 'width':550, 'height':400};
+
+	  // Display the chart inside the <div> element with id="piechart"
+	  var chart = new google.visualization.PieChart(document.getElementById('pieChartMethods'));
+	  chart.draw(data, options);
+	}
+	google.charts.load('current', {'packages':['corechart']});
+	google.charts.setOnLoadCallback(drawChartMethods);
+
 $(function() {
 
 	const count = document.createTextNode("Clone pair No."+(i+1)+" of "+data.length);
 	document.getElementById("tilteTable").appendChild(count);
-	var filePath1 = document.createTextNode(`${data[i].File1Path}`);
-	var filePath2 = document.createTextNode(`${data[i].File2Path}`);
+	var Path1Output = `${data[i].File1Path}`;
+	var Path1Mod = Path1Output.split("nodeJS_Rest\\");
+	var Path2Output = `${data[i].File2Path}`;
+	var Path2Mod = Path1Output.split("nodeJS_Rest\\");
+	var filePath1 = document.createTextNode(Path1Mod[1]);
+	var filePath2 = document.createTextNode(Path2Mod[1]);
 	document.getElementById("Path1").appendChild(filePath1);
 	document.getElementById("Path2").appendChild(filePath2);
 
@@ -137,8 +203,12 @@ $(function() {
 		document.getElementById("tilteTable").appendChild(count);
 		document.getElementById("tilteTable").removeChild(tilteTable.firstChild);
 
-		var filePath1 = document.createTextNode(`${data[i].File1Path}`);
-		var filePath2 = document.createTextNode(`${data[i].File2Path}`);
+		var Path1Output = `${data[i].File1Path}`;
+		var Path1Mod = Path1Output.split("nodeJS_Rest");
+		var Path2Output = `${data[i].File2Path}`;
+		var Path2Mod = Path1Output.split("nodeJS_Rest");
+		var filePath1 = document.createTextNode(Path1Mod[1]);
+		var filePath2 = document.createTextNode(Path2Mod[1]);
 		document.getElementById("Path1").appendChild(filePath1);
 		document.getElementById("Path2").appendChild(filePath2);
 
@@ -174,8 +244,12 @@ $(function() {
 		document.getElementById("tilteTable").appendChild(count);
 		document.getElementById("tilteTable").removeChild(tilteTable.firstChild);
 
-		var filePath1 = document.createTextNode(`${data[i].File1Path}`);
-		var filePath2 = document.createTextNode(`${data[i].File2Path}`);
+		var Path1Output = `${data[i].File1Path}`;
+		var Path1Mod = Path1Output.split("nodeJS_Rest");
+		var Path2Output = `${data[i].File2Path}`;
+		var Path2Mod = Path1Output.split("nodeJS_Rest");
+		var filePath1 = document.createTextNode(Path1Mod[1]);
+		var filePath2 = document.createTextNode(Path2Mod[1]);
 		document.getElementById("Path1").appendChild(filePath1);
 		document.getElementById("Path2").appendChild(filePath2);
 
@@ -203,6 +277,8 @@ $(function() {
   });
 })
 })
+
+
 $('#fake-link-1').click(function(){
 	var urlString = window.location.search;
 	urlSplit = urlString.split("access_token=");
@@ -219,6 +295,24 @@ $('#settingLink').click(function(){
 					}
 				})
 	})
-
+	function HideShowChart() {
+	  var x = document.getElementById("chartArea");
+	  if (x.style.display === "none") {
+	    x.style.display = "block";
+	  } else {
+	    x.style.display = "none";
+	  }
+	}
+	$('#logout-button').click(function(){
+		fetch('http://localhost:8001/api/logout',{ method:"GET", redirect:"follow" }).then( res =>{
+			if (res.redirected) {
+							window.location.href = res.url;
+						}
+		})
+	})
+	$('#logout-button') .click(function(){
+		window.open("https://github.com/logout", "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=50,left=500,width=1000,height=800")
+		location.replace("http://localhost:8001/");
+	})
   </script>
 </html>

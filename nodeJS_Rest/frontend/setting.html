@@ -43,57 +43,54 @@
 
     </li>
           <li class="nav-item">
-              <b class="nav-link" id="logout-button" onclick="logoutFunc()" style="padding-top:35%">Logout</b>
+              <div style="padding-top:35%">
+    	<b class="nav-link" style="cursor:pointer" id="logout-button">Logout</b>
+  </div>
           </li>
         </ul>
   </nav>
   <body>
 <b style="font-size:45px;margin:20px;padding-left:45%">Setting</b>
-<table border="0" style="width:98%" align="center">
+<table border="0" style="width:98%;table-layout:fixed" align="center">
   <tr>
     <td align="center"><h2 style="padding-bottom:5px">Size Filter</h2>
     <div style="padding-left:1%;padding-top:10px">
-      <label class="switch"><input type="checkbox" id="SizeFilterButton"><div class="slider round"><!--ADDED HTML --><span class="off">OFF</span><span class="on">ON</span><!--END--></div></label>
+      <label class="switch"><input type="checkbox" id="SizeFilterButton" value="off"><div class="slider round"><!--ADDED HTML --><span class="off">OFF</span><span class="on">ON</span><!--END--></div></label>
       </label>
     </div></td>
     <td align="center"><h2 style="padding-bottom:5px">syntactic metrics</h2>
     <div style="padding-left:1%;padding-top:10px">
-      <label class="switch"><input type="checkbox" id="SynButton"><div class="slider round"><!--ADDED HTML --><span class="off">OFF</span><span class="on">ON</span><!--END--></div></label>
+      <label class="switch"><input type="checkbox" id="SynButton" value="off"><div class="slider round"><!--ADDED HTML --><span class="off">OFF</span><span class="on">ON</span><!--END--></div></label>
       </label>
     </div></td>
   </tr>
   <tr>
-    <td style="padding-left:18%"><h2 style="padding-top:5px;padding-bottom:5px">Select Model</h2>
+    <td style="text-align:center">
+      <h2 style="padding-top:5px;padding-bottom:5px">Select Model</h2>
       <div style="padding=left:10%">
-    <div class="form-check">
-      <input type="radio" id="DT" name="model" value="DT">
-      <label for="male">Decision Tree</label>
-    </div>
-    <div class="form-check">
-      <input type="radio" id="RF" name="model" value="RF">
-      <label for="female">Random forest</label>
-    </div>
-    <div class="form-check">
-      <input type="radio" id="SVM" name="model" value="SVM">
-      <label for="SVM">SVM</label>
-    </div>
-    <div class="form-check">
-      <input type="radio" id="SMO" name="model" value="SMO">
-      <label for="SMO">SVM using SMO</label>
-    </div>
-    </div></td>
+
+    <select id="model">
+      <option value="smo">SVM + SMO</option>
+      <option value="svm">SVM</option>
+      <option value="randomforest">Random forest</option>
+      <option value="decisiontree">Decision Tree</option>
+    </select>
+</div>
+  </td>
     <td align="center"><h2 style="padding-bottom:5px">semantic metrics</h2>
     <div style="padding-left:1%;padding-top:10px">
-      <label class="switch"><input type="checkbox" id="SemButton"><div class="slider round"><!--ADDED HTML --><span class="off">OFF</span><span class="on">ON</span><!--END--></div></label>
+      <label class="switch"><input type="checkbox" id="SemButton"><div class="slider round"><!--ADDED HTML --><span class="off" value="off">OFF</span><span class="on" value="off">ON</span><!--END--></div></label>
       </label>
   </div></td>
   </tr>
 </table>
+
 <div style="padding-top:18%" align="center">
-  <button type="button" class="btn btn-primary btn-lg" style="background-color: #73b504;border-color:grey;padding: 16px 100px;font-size:20px">Save Setting</button>
+  <button type="button" id="saveSettingButton" class="btn btn-primary btn-lg" style="background-color: #73b504;border-color:grey;padding: 16px 100px;font-size:20px">Save Setting</button>
 </div>
   </body>
   <script>
+
     const query = window.location.search.substring(1)
   	const token = query.split('access_token=')[1]
     fetch('https://api.github.com/user',{
@@ -130,5 +127,55 @@
               }
       			})
       })
+
+      $("#saveSettingButton").click(function(){
+      console.log(document.getElementById('SemButton').checked);
+      if ( document.getElementById('SemButton').checked == false){
+        var sem = "on";
+      }else {
+        sem = "off";
+      }
+      console.log(document.getElementById('SynButton').checked);
+      if ( document.getElementById('SynButton').checked == false){
+        var syn = "on";
+      }else {
+        syn = "off";
+      }
+      console.log(document.getElementById('SizeFilterButton').checked);
+      if ( document.getElementById('SizeFilterButton').checked == false){
+        var size = "on";
+      }else {
+        size = "off";
+      }
+      console.log(sem);
+      console.log(syn);
+      console.log(size);
+      var model = document.getElementById('model').value;
+      console.log(model);
+      var data = ({sem: sem, syn: syn, size: size, model: model});
+
+      const headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      };
+
+      const method = 'POST';
+
+      const body = JSON.stringify(data);
+
+      const payload = {
+        method,
+        headers,
+        body,
+      };
+      fetch('http://localhost:8001/saveSetting', payload).then( res=>{
+        alert("Your config have been saved!")
+        location.replace("http://localhost:8001/welcome.html?access_token="+token);
+      })
+    })
+    $('#logout-button') .click(function(){
+      window.open("https://github.com/logout", "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=50,left=500,width=1000,height=800")
+      location.replace("http://localhost:8001/");
+    })
   </script>
 </html>

@@ -31,7 +31,9 @@
     </ul>
 <ul class="nav justify-content-end" id="menu" style="padding-left:80%">
         <li class="nav-item">
-            <b class="nav-link" id="logout-button" onclick="logoutFunc()" style="padding-top:35%">Logout</b>
+            <div style="padding-top:35%">
+    	<b class="nav-link" style="cursor:pointer" id="logout-button">Logout</b>
+  </div>
         </li>
       </ul>
 </nav>
@@ -180,5 +182,9 @@ $('#settingLink').click(function(){
 	function goBack() {
   window.history.back();
 }
+$('#logout-button') .click(function(){
+	window.open("https://github.com/logout", "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=50,left=500,width=1000,height=800")
+	location.replace("http://localhost:8001/");
+})
   </script>
 </html>

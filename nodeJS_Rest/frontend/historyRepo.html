@@ -28,12 +28,14 @@
   						<span id="settingLink" style="color: blue;cursor: pointer;font-size:24px">Setting</span>
   				</li>
       </ul>
-  <ul class="nav justify-content-end" id="menu" style="padding-left:75%">
+  <ul class="nav justify-content-end" id="menu" style="padding-left:70%">
     <li class="nav-item"id="ProPic">
 
     </li>
           <li class="nav-item">
-              <b class="nav-link" id="logout-button" onclick="logoutFunc()" style="padding-top:35%">Logout</b>
+              <div style="padding-top:35%">
+    	<b class="nav-link" style="cursor:pointer" id="logout-button">Logout</b>
+  </div>
           </li>
         </ul>
   </nav>
@@ -161,5 +163,9 @@ function getMongoData(githubName){
         }
       })
     }
+    $('#logout-button') .click(function(){
+      window.open("https://github.com/logout", "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=50,left=500,width=1000,height=800")
+      location.replace("http://localhost:8001/");
+    })
 </script>
 </html>
