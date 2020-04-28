@@ -28,7 +28,6 @@ const lineReader = require('line-reader');
 app.get('/oauth/redirect', (req, res) => {
   // The req.query object has the query params that
   // were sent to this route. We want the `code` param
-  console.log(req.query);
   const requestToken = req.query.code
   axios({
     // make a POST request
@@ -43,8 +42,8 @@ app.get('/oauth/redirect', (req, res) => {
   }).then((response) => {
     // Once we get the response, extract the access token from
     // the response body
-    console.log(response.data);
     accessToken= response.data.access_token;
+    res.cookie("access_token", `${response.data.access_token}`, { maxAge: 900000 });
     //const username = response.data.username
     // redirect the user to the welcome page, along with the access token
     res.redirect(`/welcome.html?access_token=${accessToken}`)
@@ -58,17 +57,21 @@ app.post('/api/clone', function(req, res) {
   const args = [
     "clone",
     `${req.body.github}`,
-    "./temp"
+    `./${req.body.reposName}`
   ];
 
   const child = require("child_process").spawnSync("git", args);
 console.log("clone");
+
+let rawdata = fs.readFileSync('setting-config.json');
+let setting = JSON.parse(rawdata);
+
 var ObjectId = new ObjectID();
         var user = `${req.body.user}`;
         var repoName = `${req.body.reposName}`;
         let time = moment().format('MMMM Do YYYY, H:mm:ss');
         let obj = { _id: ObjectId, owner: user, repoName: repoName, date: time};
-        execSync('java -jar MerryEngine.jar -DBport 27017 -DBurl localhost -execID '+ ObjectId +' -c2vpath C:\\Users\\User\\Documents\\SP2019-DNC\\nodeJS_Rest\\code2vec -workingdir C:\\Users\\User\\Documents\\SP2019-DNC\\nodeJS_Rest\\dumpFolder -input C:\\Users\\User\\Documents\\SP2019-DNC\\nodeJS_Rest\\temp -output C:\\Users\\User\\Documents\\SP2019-DNC\\nodeJS_Rest\\output.csv')
+        execSync('java -jar MerryEngine.jar -DBport 27017 -DBurl localhost -sem '+setting.sem+' -syn '+setting.syn+' -model '+setting.model+' -size-filter '+setting.size+' -execID '+ ObjectId +' -c2vpath C:\\Users\\User\\Documents\\SP2019-DNC\\nodeJS_Rest\\code2vec -workingdir C:\\Users\\User\\Documents\\SP2019-DNC\\nodeJS_Rest\\dumpFolder -input C:\\Users\\User\\Documents\\SP2019-DNC\\nodeJS_Rest\\'+repoName+' -output C:\\Users\\User\\Documents\\SP2019-DNC\\nodeJS_Rest\\output.csv')
         console.log("Done getting results");
 
         MongoClient.connect(dburl, {
@@ -84,9 +87,16 @@ var ObjectId = new ObjectID();
         });
         });
 
-              execSync('rmdir /s /q .\\temp')
-              console.log("remove folder");
+        execSync(`rmdir /s /q .\\${req.body.reposName}`)
+        console.log("remove folder");
 
+        let defaultSetting = {"sem":"on","syn":"on","size":"on","model":"smo"};
+
+        let data = JSON.stringify(defaultSetting);
+        fs.writeFileSync('setting-config.json', data, (err) => {
+            if (err) throw err;
+            console.log('Data written to file');
+        });
 res.json(obj);
 })
 
@@ -101,35 +111,31 @@ const args = [
 
 const child = require("child_process").spawnSync("git", args);
 console.log("clone");
-    //execute simian tool function and output in text file
-    execSync('java -jar simian-2.5.10.jar -reportDuplicateText ./temp/**.java > .\\output.txt | type .\\output.txt')
-    console.log("execute tool");
-      //remove temp folder
-      execSync('rmdir /s /q .\\temp')
-      console.log("remove folder");
-        //read output.text file that generate while cloning from github
-        let data = fs.readFileSync('./output.txt','utf8');
-        let obj = {result: data};
-        //return reponse in json
-        res.json(obj);
-        //connect to mongodb
-        MongoClient.connect(dburl, {
-        useUnifiedTopology: true,
-        useNewUrlParser: true,
-        }, function(err, db) {
-          if (err) throw err;
-          //find database "Data"
-          var dbo = db.db("MerryDB");
-          //find collection "tempAnalysed" and insert json name "obj"
-            dbo.collection("tempAnalysed").insertOne(obj, function(err, res) {
-              if (err) throw err;
-              console.log("document inserted");
-              db.close();
-        });
-        });
+var ObjectId = "temp";
+      let time = moment().format('MMMM Do YYYY, H:mm:ss');
+      let obj = { _id: ObjectId, date: time};
+      execSync('java -jar MerryEngine.jar -DBport 27017 -DBurl localhost -execID '+ ObjectId +' -c2vpath C:\\Users\\User\\Documents\\SP2019-DNC\\nodeJS_Rest\\code2vec -workingdir C:\\Users\\User\\Documents\\SP2019-DNC\\nodeJS_Rest\\dumpFolder -input C:\\Users\\User\\Documents\\SP2019-DNC\\nodeJS_Rest\\temp -output C:\\Users\\User\\Documents\\SP2019-DNC\\nodeJS_Rest\\output.csv')
+      console.log("Done getting results");
+      MongoClient.connect(dburl, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+      }, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("MerryDB");
+          dbo.collection("guestAnalsysed").insertOne(obj, function(err, res) {
+            if (err) throw err;
+            console.log("document inserted");
+      db.close();
+      });
+      });
+
+            execSync('rmdir /s /q .\\temp')
+            console.log("remove folder");
+
+res.json(obj);
 })
 
-app.get('/api/getLatestResult', function(req, res){
+app.get('/api/getGuestResult', function(req, res){
   MongoClient.connect(dburl, {
   useUnifiedTopology: true,
   useNewUrlParser: true,
@@ -137,7 +143,7 @@ app.get('/api/getLatestResult', function(req, res){
     if (err) throw err;
     var dbo = db.db("MerryDB");
     //Sort the result by latest date:
-    dbo.collection('analysedRepoInfo').aggregate([
+    dbo.collection('guestAnalsysed').aggregate([
        { $sort : { _id : -1 } },
        { $limit: 1 },
       {
@@ -164,6 +170,85 @@ app.get('/api/getLatestResult', function(req, res){
   });
   });
  });
+
+ app.get('/api/getLatestResult', function(req, res){
+   MongoClient.connect(dburl, {
+   useUnifiedTopology: true,
+   useNewUrlParser: true,
+   }, function(err, db) {
+     if (err) throw err;
+     var dbo = db.db("MerryDB");
+     //Sort the result by latest date:
+     dbo.collection('analysedRepoInfo').aggregate([
+        { $sort : { _id : -1 } },
+        { $limit: 1 },
+       {
+     $project: {
+       _id: {
+         $toString: "$_id"
+       }
+     }
+   },
+     {
+       $lookup:
+        {
+          from: 'Result',
+          localField: '_id',
+          foreignField: 'ExecutionID',
+          as: 'cloneResult'
+        }
+      },
+        {
+          $unwind: "$cloneResult"
+        },
+        {
+        $lookup:
+         {
+           from: 'graphInfo',
+           localField: '_id',
+           foreignField: '_id',
+           as: 'cloneCount'
+         }
+      }
+    ]).toArray(function(err, result) {
+     if (err) throw err;
+     console.log(result);
+     res.json(result);
+     db.close();
+   });
+   });
+  });
+
+ app.post('/api/getResultById', function(req, res){
+   MongoClient.connect(dburl, {
+   useUnifiedTopology: true,
+   useNewUrlParser: true,
+   }, function(err, db) {
+  if (err) throw err;
+  var dbo = db.db("MerryDB");
+  dbo.collection('Result').aggregate([
+     { $match: { ExecutionID: `${req.body.id}` }
+},
+     {
+     $lookup:
+      {
+        from: 'graphInfo',
+        localField: 'ExecutionID',
+        foreignField: '_id',
+        as: 'cloneCount'
+      }
+   }
+ ]).toArray(function(err, result) {
+    if (err) throw err;
+    console.log(result);
+    res.json(result);
+    db.close();
+  });
+});
+  });
+  app.get('/gotoGuestResult', function(req, res){
+    res.redirect('http://localhost:8001/ResultGuest.html');
+  })
  app.get('/setting', function(req, res){
    res.redirect(`http://localhost:8001/setting.html?access_token=${req.query.accessToken}`);
  })
@@ -178,6 +263,9 @@ app.get('/api/getLatestResult', function(req, res){
  })
  app.get('/historyRepo', function(req, res){
    res.redirect(`http://localhost:8001/historyRepo.html?repository=${req.query.repository}&access_token=${req.query.accessToken}`);
+ })
+ app.get('/gotoResultById', function(req, res){
+   res.redirect(`http://localhost:8001/ResultById.html?id=${req.query.id}&access_token=${req.query.accessToken}`);
  })
  app.post('/getHistoryRepo', function(req, res){
    MongoClient.connect(dburl, {
@@ -215,9 +303,13 @@ app.post('/getHistory', function(req, res){
     });
   });
 })
-// app.delete('/api/logout', function(req, res){
-//   res.redirect('/');
-// });
+
+app.post('/saveSetting', function(req, res){
+let data = JSON.stringify(req.body);
+fs.writeFileSync('setting-config.json', data)
+console.log("config saved!");
+  res.end()
+})
 //localhost 8001
 app.listen(global.gConfig.node_port,() => {
   console.log(`${global.gConfig.app_name} listening on port ${global.gConfig.node_port}`);

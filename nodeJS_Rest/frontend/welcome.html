@@ -4,13 +4,13 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-		 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-		 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-		 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-		 <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 		 <link href="styles.css" rel="stylesheet" />
 </head>
 
@@ -22,19 +22,21 @@
 								<img src="/images/logo.png" alt="Merry's logo" style="width:70px;height:70px;">
 							</a>
 					</li>
-				<li class="nav-item" style="padding-top:17%;padding-left:5%">
-						<span id="fake-link-1" style="color: blue;cursor: pointer;">History</span>
+				<li class="nav-item" style="padding-top:10%;padding-left:5%">
+						<span id="fake-link-1" style="color: blue;cursor: pointer;;font-size:24px">History</span>
 				</li>
-				<li class="nav-item" style="padding-top:17%;padding-left:13%;">
-						<span id="settingLink" style="color: blue;cursor: pointer;">Setting</span>
+				<li class="nav-item" style="padding-top:10%;padding-left:10%">
+						<span id="settingLink" style="color: blue;cursor: pointer;;font-size:24px">Setting</span>
 				</li>
 			</ul>
- <ul class="nav justify-content-end" id="menu" style="padding-left:78%">
+ <ul class="nav justify-content-end" id="menu" style="padding-left:70%">
 	 	<li class="nav-item"id="ProPic">
 
 		</li>
 					<li class="nav-item">
-							<b class="nav-link" id="logout-button" onclick="logoutFunc()" style="padding-top:35%">Logout</b>
+						<div style="padding-top:35%">
+    	<b class="nav-link" style="cursor:pointer" id="logout-button">Logout</b>
+  </div>
 					</li>
 				</ul>
 </nav>
@@ -74,8 +76,7 @@
 </div>
 </div>
       </div>
-			<div id="finishModal" style="font-size:16px"></div>
-			<p><button id="toggle" type="button" class="btn btn-success" style="display:none">Toggle Completed</button></p>
+			<button id="toggle" type="button" class="btn btn-success" style="display:none">Toggle Completed</button>
 			<div style="padding-left:40%;size:30px">
 			<button id="viewResultButtonArea" class="btn btn-success" style="display:none" onclick="gotoResult()">view result</button>
 		</div>
@@ -88,6 +89,7 @@
 <script>
 	// We can get the token from the "access_token" query
 	// param, available in the browsers "location" global
+
 	const query = window.location.search.substring(1)
 	const token = query.split('access_token=')[1]
 
@@ -217,10 +219,7 @@ $('#launchLoading').click()
 	})
 }
 	function gotoOldResult(repoData){
-		var urlString = window.location.search;
-		urlSplit = urlString.split("=");
-		accessToken = urlSplit[1];
-		fetch('http://localhost:8001/historyRepo/?repository='+repoData+'&accessToken='+accessToken, { method:"GET", redirect:"follow" }).then( res => {
+		fetch('http://localhost:8001/historyRepo/?repository='+repoData, { method:"GET", redirect:"follow" }).then( res => {
 			if (res.redirected) {
 							window.location.href = res.url;
 					}
@@ -234,11 +233,6 @@ $('#launchLoading').click()
 					})
 		})
 
-	function logoutFunc(){
-		fetch('http://localhost:8001/api/logout', { method:"GET" }).then( async (res)=>{
-			alert("You have logout!");
-		});
-	}
 $('#fake-link-1').click(function(){
 	fetch('http://localhost:8001/history/?accessToken='+token, { method:"GET", redirect:"follow" }).then(res => {
 		if (res.redirected) {
@@ -247,13 +241,14 @@ $('#fake-link-1').click(function(){
 			})
 })
 function gotoResult(){
-	var urlString = window.location.search;
-	urlSplit = urlString.split("=");
-	accessToken = urlSplit[1];
-	fetch('http://localhost:8001/result/?accessToken='+accessToken, { method:"GET", redirect:"follow" }).then( res => {
+	fetch('http://localhost:8001/result/?accessToken='+token, { method:"GET", redirect:"follow" }).then( res => {
 		if (res.redirected) {
 						window.location.href = res.url;
 				} })
 }
+$('#logout-button') .click(function(){
+	window.open("https://github.com/logout", "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=50,left=500,width=1000,height=800")
+	location.replace("http://localhost:8001/");
+})
 </script>
 </html>

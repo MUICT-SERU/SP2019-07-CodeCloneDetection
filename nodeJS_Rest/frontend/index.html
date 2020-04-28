@@ -38,9 +38,9 @@
           </ul>
         </div>
  <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
-   <ul class="nav justify-content-end" id="menu" style="padding-left:83%">
+   <ul class="nav justify-content-end" id="menu" style="padding-left:80%">
             <li class="nav-item">
-                <a class="nav-link" href="https://github.com/login/oauth/authorize?client_id=31ec50555fca84725afa&redirect_uri=http://localhost:8001/oauth/redirect">Login with GitHub</a>
+                <a class="nav-link" href="https://github.com/login/oauth/authorize?client_id=31ec50555fca84725afa&redirect_uri=http://localhost:8001/oauth/redirect" style="font-size:16px">Login with GitHub</a>
             </li>
           </ul>
     </div>
@@ -65,25 +65,28 @@
   Launch demo modal
 </button>
 
-<div class="modal fade" id="ModalCenter" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true"  data-keyboard="false" data-backdrop="static">
+<div class="modal fade" id="ModalCenter" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true" data-keyboard="false" data-backdrop="static">
   <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
+    <div class="modal-content" style="width:300%">
       <div class="modal-header">
-        <h3 class="modal-title" id="ModalCenterTitle">Processing please wait...</h3>
+        <h3 class="modal-title" id="ModalCenterTitle" style="font-size:30px">Processing please wait...</h3>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body">
-        <div class="d-flex align-items-center" style="padding-left:5%">
-      		<strong style="font-size:30px;">Loading...</strong>
-      		<div style="padding-left:35%">
-      <div class="circle-loader" >
-        <div class="checkmark draw"></div>
+      <div class="modal-body" id="mordal-body">
+	<div class="d-flex align-items-center" style="padding-left:5%" id="loadingModal">
+		<strong style="font-size:30px;" id="textModal">Loading...</strong>
+		<div style="padding-left:35%" id="checkmarkLoading">
+<div class="circle-loader" >
+  <div class="checkmark draw"></div>
+</div>
+</div>
       </div>
-</div>
-</div>
-			<p><button id="toggle" type="button" class="btn btn-success" style="display:none">Toggle Completed</button></p>
+			<button id="toggle" type="button" class="btn btn-success" style="display:none">Toggle Completed</button>
+			<div style="padding-left:40%;size:30px">
+			<button id="viewResultButtonArea" class="btn btn-success" style="display:none" onclick="gotoGuestResult()">view result</button>
+		</div>
     </div>
   </div>
 </div>
@@ -127,9 +130,18 @@ $('#launchLoading').click()
       const data = await res.json();
       console.log(data);
       $('#toggle').click()
+      document.getElementById("checkmarkLoading").setAttribute("style","padding-left:53%");
+      document.getElementById("ModalCenterTitle").innerHTML = "Result";
+      document.getElementById("textModal").innerHTML = "Done";
+      $('#viewResultButtonArea').fadeIn(2000);
     });
   }
-
+  function gotoGuestResult(){
+  	fetch('http://localhost:8001/gotoGuestResult/', { method:"GET", redirect:"follow" }).then( res => {
+  		if (res.redirected) {
+  						window.location.href = res.url;
+  				} })
+  }
 </script>
 </body>
 

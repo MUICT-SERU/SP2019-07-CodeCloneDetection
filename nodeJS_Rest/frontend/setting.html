@@ -3,6 +3,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
   	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<!-- Popper JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
   	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -20,27 +31,66 @@
                 <img src="/images/logo.png" alt="Merry's logo" style="width:70px;height:70px;">
               </a>
           </li>
-        <li class="nav-item" style="padding-top:15%">
-            <span class="nav-link" id="fake-link-1" style="color: blue;cursor: pointer;">Respositories</span>
+        <li class="nav-item" style="padding-top:8%">
+            <span class="nav-link" id="fake-link-1" style="color: blue;cursor: pointer;font-size:24;">Respos</span>
         </li>
+        <li class="nav-item" style="padding-top:10%;padding-left:5%">
+						<span id="HistoryLink" style="color: blue;cursor: pointer;;font-size:24px">History</span>
+				</li>
       </ul>
-  <ul class="nav justify-content-end" id="menu" style="padding-left:83%">
+  <ul class="nav justify-content-end" id="menu" style="padding-left:75%">
     <li class="nav-item"id="ProPic">
 
     </li>
           <li class="nav-item">
-              <b class="nav-link" id="logout-button" onclick="logoutFunc()" style="padding-top:35%">Logout</b>
+              <div style="padding-top:35%">
+    	<b class="nav-link" style="cursor:pointer" id="logout-button">Logout</b>
+  </div>
           </li>
         </ul>
   </nav>
   <body>
-<h1>This is setting page</h1>
-  <label class="switch">
-    <input type="checkbox">
-    <span class="slider round"></span>
-  </label>
+<b style="font-size:45px;margin:20px;padding-left:45%">Setting</b>
+<table border="0" style="width:98%;table-layout:fixed" align="center">
+  <tr>
+    <td align="center"><h2 style="padding-bottom:5px">Size Filter</h2>
+    <div style="padding-left:1%;padding-top:10px">
+      <label class="switch"><input type="checkbox" id="SizeFilterButton" value="off"><div class="slider round"><!--ADDED HTML --><span class="off">OFF</span><span class="on">ON</span><!--END--></div></label>
+      </label>
+    </div></td>
+    <td align="center"><h2 style="padding-bottom:5px">syntactic metrics</h2>
+    <div style="padding-left:1%;padding-top:10px">
+      <label class="switch"><input type="checkbox" id="SynButton" value="off"><div class="slider round"><!--ADDED HTML --><span class="off">OFF</span><span class="on">ON</span><!--END--></div></label>
+      </label>
+    </div></td>
+  </tr>
+  <tr>
+    <td style="text-align:center">
+      <h2 style="padding-top:5px;padding-bottom:5px">Select Model</h2>
+      <div style="padding=left:10%">
+
+    <select id="model">
+      <option value="smo">SVM + SMO</option>
+      <option value="svm">SVM</option>
+      <option value="randomforest">Random forest</option>
+      <option value="decisiontree">Decision Tree</option>
+    </select>
+</div>
+  </td>
+    <td align="center"><h2 style="padding-bottom:5px">semantic metrics</h2>
+    <div style="padding-left:1%;padding-top:10px">
+      <label class="switch"><input type="checkbox" id="SemButton"><div class="slider round"><!--ADDED HTML --><span class="off" value="off">OFF</span><span class="on" value="off">ON</span><!--END--></div></label>
+      </label>
+  </div></td>
+  </tr>
+</table>
+
+<div style="padding-top:18%" align="center">
+  <button type="button" id="saveSettingButton" class="btn btn-primary btn-lg" style="background-color: #73b504;border-color:grey;padding: 16px 100px;font-size:20px">Save Setting</button>
+</div>
   </body>
   <script>
+
     const query = window.location.search.substring(1)
   	const token = query.split('access_token=')[1]
     fetch('https://api.github.com/user',{
@@ -53,15 +103,12 @@
       .then(res =>{
         var githubName = `${res.login}`;
         var githubPicture = `${res.avatar_url}`;
-        const NameRepo = document.createTextNode(respositoryName)
-        document.getElementById("TitleRepo").appendChild(NameRepo)
         const ProfilePicture = document.createElement("img")
         ProfilePicture.setAttribute("style","width:70px;height:70px;")
         ProfilePicture.setAttribute("class", "img-thumbnail")
         ProfilePicture.src = githubPicture;
 
         document.getElementById("ProPic").appendChild(ProfilePicture)
-        getMongoData(`${res.login}`);
       })
 
       $('#fake-link-1').click(function(){
@@ -73,5 +120,62 @@
                   window.location.href = res.url;
               } })
       })
+      $('#HistoryLink').click(function(){
+      	fetch('http://localhost:8001/history/?accessToken='+token, { method:"GET", redirect:"follow" }).then(res => {
+      		if (res.redirected) {
+                  window.location.href = res.url;
+              }
+      			})
+      })
+
+      $("#saveSettingButton").click(function(){
+      console.log(document.getElementById('SemButton').checked);
+      if ( document.getElementById('SemButton').checked == false){
+        var sem = "on";
+      }else {
+        sem = "off";
+      }
+      console.log(document.getElementById('SynButton').checked);
+      if ( document.getElementById('SynButton').checked == false){
+        var syn = "on";
+      }else {
+        syn = "off";
+      }
+      console.log(document.getElementById('SizeFilterButton').checked);
+      if ( document.getElementById('SizeFilterButton').checked == false){
+        var size = "on";
+      }else {
+        size = "off";
+      }
+      console.log(sem);
+      console.log(syn);
+      console.log(size);
+      var model = document.getElementById('model').value;
+      console.log(model);
+      var data = ({sem: sem, syn: syn, size: size, model: model});
+
+      const headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      };
+
+      const method = 'POST';
+
+      const body = JSON.stringify(data);
+
+      const payload = {
+        method,
+        headers,
+        body,
+      };
+      fetch('http://localhost:8001/saveSetting', payload).then( res=>{
+        alert("Your config have been saved!")
+        location.replace("http://localhost:8001/welcome.html?access_token="+token);
+      })
+    })
+    $('#logout-button') .click(function(){
+      window.open("https://github.com/logout", "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=50,left=500,width=1000,height=800")
+      location.replace("http://localhost:8001/");
+    })
   </script>
 </html>

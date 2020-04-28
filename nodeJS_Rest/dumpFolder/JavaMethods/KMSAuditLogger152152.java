@@ -1,1 +1,0 @@
-void cleanup() throws IOException;

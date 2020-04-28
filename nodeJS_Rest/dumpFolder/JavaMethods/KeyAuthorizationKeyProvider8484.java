@@ -1,1 +1,0 @@
-public boolean isACLPresent(String aclName, KeyOpType opType);
