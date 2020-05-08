@@ -455,10 +455,10 @@ public class MerryEngine {
             String[] predictArgs = {"-workingDir",cmd.getWorkingDir(),"-Syntactic",cmd.booleanString(cmd.isSyntactic()),"-Semantic",cmd.booleanString(cmd.isSemantic()),"-model",cmd.getModel()};
             Weka.main(predictArgs);
             String prediction;
-//            MongoClient mongoClient = new MongoClient(cmd.getDBUrl(), cmd.getDBPort());
-//            DB database = mongoClient.getDB(cmd.getDBName());
-//            DBCollection collection = database.getCollection("Result");
-//            BasicDBObject document;
+            MongoClient mongoClient = new MongoClient(cmd.getDBUrl(), cmd.getDBPort());
+            DB database = mongoClient.getDB(cmd.getDBName());
+            DBCollection collection = database.getCollection("Result");
+            BasicDBObject document;
             BufferedReader modelResultReader = new BufferedReader(new FileReader(cmd.getWorkingDir()+"/result/result.csv"));
             FileWriter cloneWriter = new FileWriter(cmd.getOutputSource());
             String result = "method1FileName,method1Start,Method1End,method1SourceCode,method2FileName,method2Start,Method2End,method2SourceCode";
@@ -475,17 +475,17 @@ public class MerryEngine {
                         cloneMethodSet.add(methodHashMap.get(m2.getId()));
                         result = "\n" + m1.getFilePath() + "," + m1.getStartLine() + "," + m1.getEndLine() + "," + "," + m2.getFilePath() + "," + m2.getStartLine() + "," + m2.getEndLine() + ",";
                         cloneWriter.append(result);
-//                        document = new BasicDBObject();
-//                        document.put("ExecutionID",cmd.getExecID());
-//                        document.put("File1Path",m1.getFilePath());
-//                        document.put("startLine1",m1.getStartLine());
-//                        document.put("endLine1",m1.getEndLine());
-//                        document.put("sourceCode1",m1.getSourceCode());
-//                        document.put("File2Path",m2.getFilePath());
-//                        document.put("startLine2",m2.getStartLine());
-//                        document.put("endLine2",m2.getEndLine());
-//                        document.put("sourceCode2",m2.getSourceCode());
-//                        collection.insert(document);
+                        document = new BasicDBObject();
+                        document.put("ExecutionID",cmd.getExecID());
+                        document.put("File1Path",m1.getFilePath());
+                        document.put("startLine1",m1.getStartLine());
+                        document.put("endLine1",m1.getEndLine());
+                        document.put("sourceCode1",m1.getSourceCode());
+                        document.put("File2Path",m2.getFilePath());
+                        document.put("startLine2",m2.getStartLine());
+                        document.put("endLine2",m2.getEndLine());
+                        document.put("sourceCode2",m2.getSourceCode());
+                        collection.insert(document);
                     }
                 }
             }
@@ -496,15 +496,15 @@ public class MerryEngine {
             for(Method m : cloneMethodSet){
                 cloneLOC+= m.getLineOfCode();
             }
-//            DBCollection infoCollection = database.getCollection("graphInfo");
-//            BasicDBObject infoDocument = new BasicDBObject();
-//            infoDocument.put("_id",cmd.getExecID());
-//            infoDocument.put("total_loc",totalLOC);
-//            infoDocument.put("total_methods",totalMethods);
-//            infoDocument.put("clone_loc",cloneLOC);
-//            infoDocument.put("clone_methods",cloneMethodSet.size());
-//            infoCollection.insert(infoDocument);
-//            mongoClient.close();
+            DBCollection infoCollection = database.getCollection("graphInfo");
+            BasicDBObject infoDocument = new BasicDBObject();
+            infoDocument.put("_id",cmd.getExecID());
+            infoDocument.put("total_loc",totalLOC);
+            infoDocument.put("total_methods",totalMethods);
+            infoDocument.put("clone_loc",cloneLOC);
+            infoDocument.put("clone_methods",cloneMethodSet.size());
+            infoCollection.insert(infoDocument);
+            mongoClient.close();
         }
         Date endDate = new Date();
         long endTime = endDate.getTime();
