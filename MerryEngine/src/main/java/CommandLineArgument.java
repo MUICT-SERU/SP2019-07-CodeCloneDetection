@@ -13,8 +13,9 @@ public class CommandLineArgument {
     private String workingDir;
     private boolean isSyntactic = true;
     private boolean isSemantic = true;
-    private String model = "SMO";
+    private String model = "randomForest";
     private String DBName = "MerryDB";
+    private int minLOC = 10;
 
     public CommandLineArgument(String[] args){
         for(int i=0;i< args.length;i++) {
@@ -95,6 +96,9 @@ public class CommandLineArgument {
             if(args[i].equalsIgnoreCase("-dbName")){
                 this.DBName = args[i+1];
             }
+            if(args[i].equalsIgnoreCase("-minLOC")){
+                this.minLOC = Integer.parseInt(args[i+1]);
+            }
 
         }
     }
@@ -168,5 +172,9 @@ public class CommandLineArgument {
 
     public String getDBName() {
         return DBName;
+    }
+
+    public int getMinLOC() {
+        return minLOC;
     }
 }
