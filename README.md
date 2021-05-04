@@ -3,9 +3,9 @@ A repo for the senior project team DoNotCopy.
 
 
 ### Merry Engine Command Line Arguments
-```bash
+
 | Command Arg     	| Definition                                                     	| Example                                             	|
-|-----------------	|----------------------------------------------------------------	|-----------------------------------------------------	|
+|-------------------|-----------------------------------------------------------------|-------------------------------------------------------|
 | -input          	| input file path                                                	| -input /Users/User/Documents/GitHub/Example         	|
 | -size-filter    	| turn on / turn off size filter. Default is on                  	| -size-filter on / off                               	|
 | -size-threshold 	| threshold of size filter between 0.0 - 1.0. Default is 0.8     	| -size-threshold 0.8                                 	|
@@ -16,4 +16,4 @@ A repo for the senior project team DoNotCopy.
 | -Syntactic      	| turn on / turn off use of Syntactic metrics. Default is on     	| -Syntactic on / off                                 	|
 | -Semantic       	| turn on / turn off use of Semantic metrics. Default is on      	| -Semantic on / off                                  	|
 | -model          	| model selection (SMO, Dtree / decisionTree, randomForest, SVM) 	| -model SMO                                          	|
-```
+
