@@ -1,4 +1,4 @@
-# SP2019_DoNotCopy
+# SP2019-07 Code Clone Detection
 A repo for the senior project team DoNotCopy.
 
 
