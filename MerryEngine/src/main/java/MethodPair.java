@@ -22,6 +22,7 @@ public class MethodPair {
     private int id;
     private boolean isSyntacticOn = true;
     private boolean isSemanticOn = true;
+    private String type ="";
 
     public MethodPair(int id,Method m1,Method m2){
         this.id = id;
@@ -191,6 +192,14 @@ public class MethodPair {
 
     public boolean isDecision() {
         return decision;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public double[] getCode2VecSimilarityScore() {

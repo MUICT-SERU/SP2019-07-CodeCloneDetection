@@ -17,6 +17,7 @@ import weka.gui.treevisualizer.TreeVisualizer;
 
 import java.awt.*;
 import java.io.File;
+import java.sql.SQLOutput;
 import java.util.Random;
 
 public class Weka{
@@ -67,9 +68,11 @@ public class Weka{
             }
             model = (LibSVM) weka.core.SerializationHelper.read(modelName);
         }
-
+//        Multi-Class model
+//        model = (RandomForest) weka.core.SerializationHelper.read(cmd.getWorkingDir()+"/models/randomForestMulticlass_model.model");
 
         //Load data set
+//        ConverterUtils.DataSource source = new ConverterUtils.DataSource(cmd.getWorkingDir()+"/assets/metrics.csv");
         ConverterUtils.DataSource source = new ConverterUtils.DataSource(cmd.getWorkingDir()+"/assets/metrics.csv");
 //        ConverterUtils.DataSource source = new ConverterUtils.DataSource("assets/trainModelMetrics.csv");
         Instances dataSet = source.getDataSet();
@@ -83,13 +86,18 @@ public class Weka{
         data.setClassIndex(data.numAttributes()-1);
         dataSet.setClassIndex(data.numAttributes()-1);
 
+        System.out.println("0 is "+data.classAttribute().value(0));
+        System.out.println("1 is "+data.classAttribute().value(1));
+//        System.out.println("2 is "+data.classAttribute().value(2));
+//        System.out.println("3 is "+data.classAttribute().value(3));
+
 //        System.out.println("Num attribute : "+data.numAttributes());
         //prediction
         int countTrue = 0;
         int countFalse = 0;
         int tp = 0, tn = 0,fn = 0, fp = 0;
         Random rand = new Random(1);
-        for(int i = 0; i< data.numInstances();i++){
+        for(int i = 0; i < data.numInstances();i++){
             Instance instance = data.instance(i);
 //            int predictValue =0;
             double predictValue = model.classifyInstance(instance);
@@ -117,6 +125,7 @@ public class Weka{
                 predictString = "false";
                 countFalse++;
             }
+//            predictString = data.classAttribute().value((int) predictValue);
 //            System.out.println(predictString);
             dataSet.get(i).setValue(dataSet.numAttributes()-1,predictString);
 //            dataSet.get(i).setClassValue(predictString);
@@ -133,14 +142,24 @@ public class Weka{
 //        System.out.println("_________________________________");
 //        Evaluation eval = new Evaluation(data);
 //        eval.evaluateModel(model,data);
-////        System.out.println(eval.pctCorrect());
+//
+//        System.out.println(eval.toMatrixString("===== Confusion matrix ====="));
+//
 //        System.out.println(data.classAttribute().value(0));
 //        System.out.println("Precision "+eval.precision(0));
 //        System.out.println("Recall "+eval.recall(0));
 //        System.out.println("f1 "+eval.fMeasure(0));
-//        System.out.println("Precision weight "+eval.weightedPrecision());
-//        System.out.println("Recall weight "+eval.weightedRecall());
-//        System.out.println("f1 weight "+eval.weightedFMeasure());
+//
+//        System.out.println(data.classAttribute().value(1));
+//        System.out.println("Precision "+eval.precision(1));
+//        System.out.println("Recall "+eval.recall(1));
+//        System.out.println("f1 "+eval.fMeasure(1));
+//
+//        System.out.println(data.classAttribute().value(2));
+//        System.out.println("Precision "+eval.precision(2));
+//        System.out.println("Recall "+eval.recall(2));
+//        System.out.println("f1 "+eval.fMeasure(2));
+
         CSVSaver saver = new CSVSaver();
         saver.setInstances(dataSet);
         saver.setFile(new File(cmd.getWorkingDir()+"/result/result.csv"));
